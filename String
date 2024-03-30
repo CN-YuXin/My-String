@@ -1,0 +1,886 @@
+#ifndef STRING_OF_YX
+#define STRING_OF_YX
+
+#include <ostream>
+#include <istream>
+#include <type_traits>
+#include <_Rule>
+#include <string>
+#include <initializer_list>
+
+#ifdef STD_NAMESPACE
+namespace STD_NAMESPACE {
+#endif
+
+template <typename T,typename SIZE_TYPE = unsigned long long>
+class BasicString {
+	static_assert(std::is_same_v<T,char>
+		or std::is_same_v<T,wchar_t>
+		or std::is_same_v<T,char32_t>
+		or std::is_same_v<T,char16_t>,
+		"Illegal type");
+ public:
+	using SizeType = SIZE_TYPE;
+	using CharType = T;
+	using Iterator = T*;
+	using ConstIterator = const T*;
+	const SizeType &Length,
+		&Size,
+		&Capacity;
+	const ConstIterator &Data;
+	BasicString() noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(new T[15]),
+		_Size(0),
+		_Capacity(15) {
+	}
+	explicit BasicString(SizeType Cap) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(new T[Cap]),
+		_Size(0),
+		_Capacity(Cap) {
+	}
+	template <SizeType SIZE>
+	BasicString(TYPE<const T[SIZE]> &text) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForText(text)),
+		_Size(SIZE - 1),
+		_Capacity(SIZE - 1) {
+	}
+	BasicString(BasicString&& move) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(move._Data),
+		_Size(move._Size),
+		_Capacity(move._Capacity) {
+		move._Data = nullptr;
+		
+		move._Size = 0;
+		
+		move._Capacity = 0;
+	}
+	BasicString(const BasicString& copy) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForCopy(copy)),
+		_Size(copy._Size),
+		_Capacity(copy._Size) {
+	}
+	template <SizeType SIZE>
+	BasicString(TYPE<const volatile T[SIZE]>& arr, SizeType begin, SizeType end) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForArray(arr,begin,end)),
+		_Size(begin >= SIZE or end <= begin ? 0 : end - begin),
+		_Capacity(end <= begin ? SIZE : _Size) {
+	}
+	BasicString(const BasicString &txt, SizeType b, SizeType e) noexcept:
+	 	Length(_Size),
+	 	Size(_Size),
+	 	Capacity(_Capacity),
+	 	Data((decltype(Data))_Data),
+	 	_Data(InitForString(txt,b,e)),
+	 	_Size(e <= b ? 0 : e - b),
+	 	_Capacity(e <= b ? txt.Size : _Size) {
+	}
+	BasicString(const std::initializer_list<T> &init) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForInit(init)),
+		_Size(init.size()),
+		_Capacity(init.size()) {
+	}
+	BasicString(const std::basic_string<T> &stxt) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForStdString(stxt)),
+		_Size(stxt.size()),
+		_Capacity(stxt.size()) {
+	}
+	BasicString(SizeType _co, T _c) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForChar(_c,_co)),
+		_Size(_co),
+		_Capacity(_co) {
+	}
+	BasicString(SizeType _co, const BasicString &_tx) noexcept:
+		Length(_Size),
+		Size(_Size),
+		Capacity(_Capacity),
+		Data((decltype(Data))_Data),
+		_Data(InitForString(_tx,_co)),
+		_Size(_tx.Size * _co),
+		_Capacity(_tx.Size * _co) {
+	}
+	constexpr const T* GetData() const noexcept {
+		return _Data;
+	}
+	constexpr SizeType GetLength() const noexcept {
+		return _Size;
+	}
+	constexpr SizeType GetSize() const noexcept {
+		return _Size;
+	}
+	constexpr SizeType GetCapacity() const noexcept {
+		return _Capacity;
+	}
+	constexpr T& GetSecond() const noexcept {
+		return _Data[_Size - 1];
+	}
+	constexpr T& GetFirst() const noexcept {
+		return _Data[0];
+	}
+	constexpr Iterator begin() const noexcept {
+		return _Data;
+	}
+	constexpr Iterator end() const noexcept {
+		return _Data + _Size;
+	}
+	constexpr const Iterator cbegin() const noexcept {
+		return _Data;
+	}
+	constexpr const Iterator cend() const noexcept {
+		return _Data + _Size;
+	}
+	constexpr Iterator GetBeginIterator() const noexcept {
+		return _Data;
+	}
+	constexpr Iterator GetEndIterator() const noexcept {
+		return _Data + _Size;
+	}
+	constexpr T& operator[] (SizeType index) const noexcept {
+		return _Data[index];
+	}
+	constexpr bool operator==(const BasicString &e) const noexcept {
+		return Equals(e);
+	}
+	constexpr bool operator!=(const BasicString &e) const noexcept {
+		return !Equals(e);
+	}
+	constexpr bool operator<(const BasicString &txt) const noexcept {
+		return Size < txt.Size;
+	}
+	constexpr bool operator<=(const BasicString &txt) const noexcept {
+		return Size <= txt.Size;
+	}
+	constexpr bool operator>(const BasicString &txt) const noexcept {
+		return Size > txt.Size;
+	}
+	constexpr bool operator>=(const BasicString &txt) const noexcept {
+		return Size >= txt.Size;
+	}
+	constexpr T& operator*() const noexcept {
+		return _Data[0];
+	}
+	constexpr BasicString& AppEnd(T c) noexcept {
+		return Insert(Size,c);
+	}
+	constexpr BasicString& AppEnd(const BasicString &txt) noexcept {
+		return Insert(Size,txt);
+	}
+	constexpr BasicString& AppBegin(T c) noexcept {
+		return Insert(0,c);
+	}
+	constexpr BasicString& AppBegin(const BasicString &txt) noexcept {
+		return Insert(0,txt);
+	}
+	constexpr BasicString Copy() const noexcept {
+		return *this;
+	}
+	constexpr bool IsNotEmpty() const noexcept {
+		return !IsEmpty();
+	}
+	BasicString& Insert(SizeType _in, T _c) noexcept {
+		if (_in > Size)
+			return *this;
+		bool _RN = false;
+		if (Size == Capacity) {
+			if (_in == 0)
+				ReNew(1);
+			else
+				ReNew();
+			_RN = true;
+		}
+		if ((_RN and _in != 0) or !_RN)
+			for (SizeType i = Size;i > _in;--i)
+				_Data[i] = _Data[i - 1];
+		_Data[_in] = _c;
+		++_Size;
+		return *this;
+	}
+	BasicString& Insert(SizeType _in, const BasicString &txt) noexcept {
+		if (_in > Size or txt.Size == 0)
+			return *this;
+		bool _RN = false;
+		if (Size + txt.Size > Capacity) {
+			if (_in == 0)
+				ReNew(txt.Size,txt.Size + Size);
+			else
+				ReNew(0,txt.Size + Size);
+			_RN = true;
+		}
+		if ((_RN and _in != 0) or !_RN)
+			for (SizeType i = Size + (txt.Size - 1);i > _in + (txt.Size - 1);--i)
+				_Data[i] = _Data[i - txt.Size];
+		for (SizeType i = _in;i < _in + txt.Size;++i)
+			_Data[i] = txt[i - _in];
+		_Size += txt.Size;
+		return *this;
+	}
+	bool IsEmpty() const noexcept {
+		if (Size == 0)
+			return true;
+		for (SizeType i = 0;i < Size;++i)
+			if (_Data[i] != 0)
+				return false;
+		return true;
+	}
+	void Clear() noexcept {
+		_Size = 0;
+	}
+	BasicString& Reverse(SizeType begin, SizeType end) noexcept {
+		if (end <= begin)
+			return *this;
+		--end;
+		for (;begin != end and end > begin;++begin,--end) {
+			_Data[begin] ^= _Data[end];
+			_Data[end]    = _Data[begin] ^ _Data[end];
+			_Data[begin] ^= _Data[end];
+		}
+		return *this;
+	}
+	BasicString& Reverse() noexcept {
+		return Reverse(0,_Size);
+	}
+	bool ReLowestCapacity(SizeType cap) noexcept {
+		if (cap < _Capacity) {
+			return true;
+		} else {
+			ReNew(0,cap);
+			return false;
+		};
+	}
+	SizeType Find(T _char, SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e;++i)
+			if (_Data[i] == _char)
+				return i;
+		return -1;
+	}
+	SizeType Find(T _c) const noexcept {
+		return Find(_c,0,Size);
+	}
+	SizeType Find(const BasicString &text, SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;(i < _e and i < Size) and i + text.Size <= _e;++i)
+			for (SizeType j = i;j < _e and j - i < text.Size and _Data[j] == text[j - i];++j)
+				if (j - i == text.Size - 1)
+					return i;
+		return -1;
+	}
+	SizeType Find(const BasicString &t) const noexcept {
+		return Find(t,0,Size);
+	}
+	template <typename F>
+	SizeType FindIf(F &&fn, SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size and i < Size;++i)
+			if (fn(Data + i))
+				return i;
+		return -1;
+	}
+	template <typename F>
+	SizeType FindIf(F &&fn) const noexcept {
+		return FindIf(fn,0,Size - 1);
+	}
+	SizeType RFind(T _c, SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _e - 1;i < _e and i >= _b;++i)
+			if (_Data[i] == _c)
+				return i;
+		return -1;
+	}
+	SizeType RFind(T _c) const noexcept {
+		return RFind(_c,0,Size);
+	}
+	SizeType RFind(const BasicString &text, SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _e - text.Size;i >= _b and i < _e and i < Size;--i) {
+			for (SizeType j = i;j < _e and j - i < text.Size and _Data[j] == text[j - i];++j)
+				if (j - i == text.Size - 1)
+					return i;
+		 }
+		return -1;
+	}
+	SizeType RFind(const BasicString &text) const noexcept {
+		return RFind(text,0,Size);
+	}
+	template <typename F>
+	SizeType RFindIf(F &&fn, SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (fn(Data + i))
+				return i;
+		return -1;
+	}
+	template <typename F>
+	SizeType RFindIf(F &&fn) const noexcept {
+		return RFindIf(fn,0,Size);
+	}
+	SizeType Count(T _c, SizeType _b, SizeType _e) const noexcept {
+		if (_e <= _b)
+			return 0;
+		SizeType _count = 0;
+		for (SizeType i = _b;i < _e and i < Size;) {
+			SizeType _res = Find(_c,i,_e);
+			if (_res != -1) {
+				i = (++_count,_res + 1);
+			} else
+				break;
+		}
+		return _count;
+	}
+	SizeType Count(T _c) const noexcept {
+		return Count(_c,0,Size);
+	}
+	SizeType Count(const BasicString &text, SizeType _b, SizeType _e) const noexcept {
+		if (_e <= _b or _e < text.Size)
+			return 0;
+		SizeType _count = 0;
+		for (SizeType i = _b;i <= _e - text.Size and i < Size;) {
+			SizeType _res = Find(text,i,_e);
+			if (_res != -1) {
+				i = (++_count,_res + text.Size);
+			} else
+				break;
+		}
+		return _count;	
+	}
+	SizeType Count(const BasicString &txt) const noexcept {
+		return Count(txt,0,Size);
+	}
+	SizeType Erase(SizeType _in) noexcept {
+		for (SizeType i = _in;i + 1 < Size;++i)
+			_Data[i] = _Data[i + 1];
+		--_Size;
+		return 1;
+	}
+	SizeType Erase(SizeType _b, SizeType _e) noexcept {
+		if (_e <= _b)
+			return 0;
+		SizeType _s = _e - _b;
+		for (SizeType i = _b;i + _s < Size;++i)
+			_Data[i] = _Data[i + _s];
+		_Size -= _s;
+		return _s;
+	}
+	SizeType Erase(SizeType b, SizeType e, T c) noexcept {
+		SizeType _count = 0;
+		while (true) {
+			SizeType _res = Find(c,b,e);
+			if (_res != -1) {
+				Erase(_res);
+				--e,++_count;
+			} else
+				break;
+		}
+		return _count;
+	}
+	SizeType Erase(SizeType b, SizeType e, const BasicString &txt) noexcept {
+		SizeType _count = 0;
+		while (true) {
+			SizeType _res = Find(txt,b,e);
+			if (_res != -1) {
+				Erase(_res,_res + txt.Size);
+				e -= txt.Size,++_count;
+			} else
+				break;
+		}
+		return _count;
+	}
+	SizeType Erase(const BasicString &txt) noexcept {
+		return Erase(0,Size,txt);
+	}
+	SizeType Fill(SizeType _b, SizeType _e , T _c) noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			_Data[i] = _c;
+		if (_e <= _b)
+			return 0;
+		return _e - _b;
+	}
+	BasicString& Replace(T _rep, SizeType b, SizeType e, T _c) noexcept {
+		for (SizeType i = b;i < e and i < Size;++i)
+			if (_Data[i] == _c)
+				_Data[i] = _rep;
+		return *this;
+	}
+	BasicString& Replace(T r, T c) noexcept {
+		return Replace(r,0,Size,c);
+	}
+	BasicString& Replace(const BasicString &txt, SizeType b, SizeType e, T c) noexcept {
+		while (true) {
+			SizeType _res = Find(c,b,e);
+			if (_res != -1) {
+				Erase(_res);
+				Insert(_res,txt);
+				e += (txt.Size - 1);
+				b += txt.Size;
+			} else
+				break;
+		}
+		return *this;
+	}
+	BasicString& Replace(const BasicString &txt, T _c) noexcept {
+		return Replace(txt,0,Size,_c);
+	}
+	BasicString& Replace(const BasicString &txt, SizeType b, SizeType e, const BasicString &str) noexcept {
+		while (true) {
+			SizeType _res = Find(str,b,e);
+			if (_res != -1) {
+				SizeType tmp = Size;
+				Erase(_res,_res + str.Size);
+				Insert(_res,txt);
+				if (Size < tmp) {
+					e -= (str.Size - txt.Size);
+				} else if (Size > tmp) {
+					e += (txt.Size - str.Size);
+				}
+				b = _res + txt.Size;
+			} else
+				break;
+		}
+		return *this;
+	}
+	BasicString& Replace(const BasicString &txt, const BasicString &str) noexcept {
+		return Replace(txt,0,Size,str);
+	}
+	BasicString& ToUpperCase(SizeType _b, SizeType _e) noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (_Data[i] >= 97 and _Data[i] <= 122)
+				_Data[i] -= 32;
+		return *this;
+	}
+	BasicString& ToUpperCase() noexcept {
+		return ToUpperCase(0,Size);
+	}
+	BasicString& ToLowerCase(SizeType _b, SizeType _e) noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (_Data[i] >= 65 and _Data[i] <= 90)
+				_Data[i] += 32;
+		return *this;
+	}
+	BasicString& ToLowerCase() noexcept {
+		return ToLowerCase(0,Size);
+	}
+	bool IsInteger(SizeType _b, SizeType _e) const noexcept {
+		bool _n = true;
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if ((_Data[i] == 45 or _Data[i] == 43) and _n)
+				continue;
+			else if (_Data[i] >= 48 and _Data[i] <= 57)
+				_n = false;
+			else if (!(_Data[i] >= 48 and _Data[i] <= 57))
+				return false;
+		return true;
+	}
+	bool IsInteger() const noexcept {
+		return IsInteger(0,Size);
+	}
+	bool HasInteger(SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (_Data[i] >= 48 and _Data[i] <= 57)
+				return true;
+		return false;
+	}
+	bool HasInteger() const noexcept {
+		return HasInteger(0,Size);
+	}
+	bool IsChar(SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (IsInteger(i,i + 1))
+				return false;
+		return true;
+	}
+	bool IsChar() const noexcept {
+		return IsChar(0,Size);
+	}
+	bool HasChar(SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (!IsInteger(i,i + 1))
+				return true;
+		return false;
+	}
+	bool HasChar() const noexcept {
+		return HasChar(0,Size);
+	}
+	bool IsLetter(SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if (!((_Data[i] >= 65 and _Data[i] <= 90) or (_Data[i] >= 97 and _Data[i] <= 122)))
+				return false;
+		return true;
+	}
+	bool IsLetter() const noexcept {
+		return IsLetter(0,Size);
+	}
+	bool HasLetter(SizeType _b, SizeType _e) const noexcept {
+		for (SizeType i = _b;i < _e and i < Size;++i)
+			if ((_Data[i] >= 65 and _Data[i] <= 90) or (_Data[i] >= 97 and _Data[i] <= 122))
+				return true;
+		return false;
+	}
+	bool HasLetter() const noexcept {
+		return HasLetter(0,Size);
+	}
+	std::string ToStdString(SizeType _b, SizeType _e) const noexcept {
+		std::string _r;
+		for (SizeType i = _b;i < _e;++i)
+			_r += _Data[i];
+		return _r;
+	}
+	std::string ToStdString() const noexcept {
+		return ToStdString(0,Size);
+	}
+	template <typename IT = int>
+	IT ToInteger(SizeType b, SizeType e) const noexcept {
+		static_assert(std::is_integral_v<IT>
+			and !std::is_same_v<IT,bool>,"Illegal type");
+		if (!IsInteger(b,e))
+			return 0;
+		bool _smal = false;
+		IT _res = 0;
+		for (SizeType i = b;i < e and i < Size;++i) {
+			if (_Data[i] == 45) {
+				_smal = !_smal;
+				continue;
+			} else if (_Data[i] == 43) {
+				continue;
+			}
+			_res += (-48 + _Data[i]);
+			if (i < e - 1)
+				_res *= 10;
+		}
+		return _smal ? -_res : _res;
+	}
+	template <typename IT = int>
+	IT ToInteger() const noexcept {
+		return ToInteger(0,Size);
+	}
+	bool Equals(const BasicString &eq) const noexcept {
+		if (Size != eq.Size)
+			return false;
+		for (SizeType i = 0;i < Size;++i)
+			if (_Data[i] != eq[i])
+				return false;
+		return true;
+	}
+	short Compare(const BasicString &txt) const noexcept {
+		if (Size < txt.Size)
+			return -1;
+		else if (Size > txt.Size)
+			return 1;
+		else
+			return 0;
+	}
+	BasicString& SetWidthString(T _c, SizeType _count) noexcept {
+		if (_count <= Size)
+			return *this;
+		for (SizeType i = 1;i <= _count - Size;++i)
+			AppBegin(_c);
+		return *this;
+	}
+	template <SizeType SIZE>
+	void ToCharArray(TYPE<volatile T[SIZE]> &rarr, SizeType b = 0, SizeType e = SIZE) const noexcept {
+		for (SizeType i = b;i < e and i < SIZE;++i)
+			rarr[i] = _Data[i - b];
+	}
+	template <SizeType MAX = 1024>
+	auto& GetLine(std::basic_istream<T> &cin, SizeType _s, char _end = '\n') noexcept {
+		T _txt[MAX] {};
+		cin.getline(_txt,_s,_end);
+		for (SizeType i = 0;_txt[i] != '\0';++i)
+			if (i == MAX or _txt[i + 1] == '\0')
+				(*this) = (BasicString(_txt,0,i + 1));
+		return *this;
+	}
+	auto& GetLine(std::basic_istream<T> &cin) noexcept {
+		return GetLine(cin,Capacity);
+	}
+	auto& GetLine(std::basic_istream<T> &cin,char _e) noexcept {
+		return GetLine(cin,Capacity,_e);
+	}
+	BasicString& operator=(const BasicString &as) noexcept {
+		if (_Size < as.Size)
+			ReNew(0,as.Size);
+		for (SizeType i = 0;i < as.Size;++i)
+			_Data[i] = as[i];
+		_Size = as.Size;
+		return *this;
+	}
+	BasicString& operator=(BasicString &&move) noexcept {
+		_Data   = move._Data;
+		move._Data = nullptr;
+		
+		_Size   = move._Size;
+		move._Size = 0;
+		
+		_Capacity   = move._Capacity;
+		move._Capacity = 0;
+		return *this;
+	}
+	BasicString& operator=(const volatile T *p) noexcept {
+		for (SizeType i = 0;p[i];++i)
+			if (!(p[i + 1]) and Size < i) ReNew(0,i);
+		for (SizeType i = 0;p[i];++i) {
+			_Data[i] = p[i];
+			if (!(p[i + 1]))
+				_Size = i + 1;
+		}
+		return *this;
+	}
+	friend auto operator<<(std::basic_ostream<T>& cout, const BasicString& text) noexcept -> decltype(cout)& {
+		for (T &i : text)
+			if (i != 0)
+				cout << i;
+		return cout;
+	}
+	template <SizeType MAX = 1024>
+	friend auto operator>>(std::basic_istream<T>& cin, BasicString<T>& text) noexcept -> decltype(cin)& {
+		T _txt[MAX] {};
+		cin >> _txt;
+		for (SizeType i = 0;_txt[i] != '\0';++i)
+			if (i == MAX or _txt[i + 1] == '\0')
+				text = (BasicString(_txt,0,i + 1));
+		return cin;
+	}
+	template <typename CT = T>
+	static BasicString ToString(bool _v, bool _t = true) noexcept {
+		if (_v) {
+			if (_t)
+				return "True";
+			else
+				return "true";
+		} else {
+			if (_t)
+				return "False";
+			else
+				return "false";
+		}
+	}
+	template <>
+	static BasicString ToString<wchar_t>(bool _v, bool _t) noexcept {
+		if (_v) {
+			if (_t)
+				return L"True";
+			else
+				return L"true";
+		} else {
+			if (_t)
+				return L"False";
+			else
+				return L"false";
+		}
+	}
+	template <>
+	static BasicString ToString<char16_t>(bool _v, bool _t) noexcept {
+		if (_v) {
+			if (_t)
+				return u"True";
+			else
+				return u"true";
+		} else {
+			if (_t)
+				return u"False";
+			else
+				return u"false";
+		}
+	}
+	template <>
+	static BasicString ToString<char32_t>(bool _v, bool _t) noexcept {
+		if (_v) {
+			if (_t)
+				return U"True";
+			else
+				return U"true";
+		} else {
+			if (_t)
+				return U"False";
+			else
+				return U"false";
+		}
+	}
+	static BasicString ToString(T _c) noexcept {
+		BasicString v;
+		v.AppEnd(_c);
+		return v;
+	}
+	template <typename IT = int>
+	static BasicString ToString(IT _value) noexcept {
+		static_assert(std::is_integral_v<IT>
+			and !std::is_same_v<IT,bool>,"Illegal type");
+		BasicString _result;
+		bool _sma = false;
+		if (_value < 0) {
+			_value = -_value;
+			_sma = true;
+		}
+		do {
+			_result.AppBegin(T(48 + _value % 10));
+			_value /= 10;
+		} while (_value != 0);
+		if (_sma)
+			_result.AppBegin((T)'-');
+		return _result;
+	}
+	template <typename IT, SizeType SIZE>
+	static BasicString ToString(TYPE<const volatile IT[SIZE]> &rarr) noexcept {
+		BasicString _res = ToString((T)'[');
+		for (SizeType i = 0;i < SIZE;++i) {
+			_res.AppEnd(ToString(rarr[i]));
+			if (i < SIZE - 1)
+				_res.AppEnd((T)',');
+		}
+		_res.AppEnd((T)']');
+		return _res;
+	}
+	static BasicString Progress(SizeType _max, decltype(_max) _cur = 0, bool _per = true, decltype(_cur) _len = 35, char _bar = '=', char _space = ' ', const BasicString &_tail = BasicString(1,(T)'>'), const BasicString &_start = BasicString(1,(T)'['), const BasicString &_end = BasicString(1,(T)']')) noexcept {
+		BasicString _r = _start;
+		if (_cur > _max)
+			_cur = _max;
+		else if (_len == 0) {
+			_r.AppEnd(_end);
+			if (_per)
+			    _r.AppEnd((T)' ').AppEnd(ToString(_cur * 100 / _max)).AppEnd((T)'%');
+			return _r;
+		}
+		if (_cur == _max) {
+		    _r.AppEnd(BasicString(_len,(T)_bar)).AppEnd(_end);
+		    if (_per)
+			    _r.AppEnd((T)' ').AppEnd(ToString(_cur * 100 / _max)).AppEnd((T)'%');
+			return _r;
+		} else if (_tail.Size > _len) {
+			_r.AppEnd(BasicString(_len,(T)_space)).AppEnd(_end);
+			if (_per)
+			    _r.AppEnd((T)' ').AppEnd(ToString(_cur * 100 / _max)).AppEnd((T)'%');
+			   return _r;
+		}
+		if (_tail.Size)
+			_r.AppEnd(BasicString((_cur * _len / _max) >= _tail.Size ? (_cur * _len / _max) - _tail.Size : 0,(T)_bar)).AppEnd(_tail);
+		else
+			_r.AppEnd(BasicString(_cur * _len / _max,(T)_bar));
+		_r.AppEnd(BasicString(_len - ((_cur * _len / _max) >= _tail.Size ? (_cur * _len / _max) : _tail.Size),(T)_space)).AppEnd(_end);
+		if (_per)
+			    _r.AppEnd((T)' ').AppEnd(ToString(_cur * 100 / _max)).AppEnd((T)'%');
+		return _r;
+	}
+	~BasicString() {
+		if (_Data != nullptr)
+			delete [] _Data;
+	}
+ private:
+	Iterator _Data;
+	SizeType _Size,
+		_Capacity;
+	template <SizeType SIZE>
+	static T* InitForText(TYPE<const T[SIZE]>& text) noexcept {
+		T *Data = new T[SIZE - 1];
+		for (SizeType i = 0;i < SIZE - 1;++i)
+			Data[i] = text[i];
+		return Data;
+	}
+	template <SizeType SIZE>
+	static T* InitForArray(TYPE<const volatile T[SIZE]> &arr, SizeType begin, SizeType end) noexcept {
+		if (end <= begin)
+			return new T[SIZE];
+		T *Data = new T[end - begin];
+		for (SizeType i = begin;i < end and i < SIZE;++i)
+			Data[i - begin] = arr[i];
+		return Data;
+	}
+	static T* InitForCopy(const BasicString& copy) noexcept {
+		T *Data = new T[copy._Size];
+		for (SizeType i = 0;i < copy._Size;++i)
+			Data[i] = copy._Data[i];
+		return Data;
+	}
+	static T* InitForString(const BasicString &txt, SizeType b, SizeType e) noexcept {
+		if (e <= b)
+			return new T[txt.Size];
+		T *Data = new T[e - b];
+		for (SizeType i = b;i < e and i < txt.Size;++i)
+			Data[i - b] = txt[i];
+		return Data;
+	}
+	static T* InitForInit(const std::initializer_list<T> &ini) noexcept {
+		T *Data = new T[ini.size()];
+		for (SizeType i = 0;i < ini.size();++i)
+			Data[i] = *(ini.begin() + i);
+		return Data;
+	}
+	static T* InitForStdString(const std::basic_string<T> &stxt) noexcept {
+		T *Data = new T[stxt.size()];
+		for (SizeType i = 0;i < stxt.size();++i)
+			Data[i] = stxt[i];
+		return Data;
+	}
+	static T* InitForChar(T _c, SizeType _cou) noexcept {
+		T *Data = new T[_cou];
+		for (SizeType i = 0;i < _cou;++i)
+			Data[i] = _c;
+		return Data;
+	}
+	static T* InitForString(const BasicString &_str, SizeType _cou) noexcept {
+		SizeType _s = _str.Size * _cou;
+		T *Data = new T[_s];
+		for (SizeType i = 0;i < _s;i += _str.Size)
+			for (SizeType j = i;j < i + _str.Size;++j)
+				Data[j] = _str[j - i];
+		return Data;
+	}
+	void ReNew(SizeType index, SizeType d) noexcept {
+		SizeType NewCap = (d * 2 - d / 2);
+		T *tmp = new T[NewCap];
+		
+		for (SizeType i = index;i < Size + index;++i) {
+			tmp[i] = _Data[i - index];
+		}
+		
+		delete [] _Data;
+		_Data = tmp;
+		_Capacity = NewCap;
+	}
+	void ReNew(SizeType index = 0) noexcept {
+		ReNew(index, (_Capacity * 2 - _Capacity / 2));
+	}
+};
+using String      = BasicString<char>;
+using WString     = BasicString<wchar_t>;
+using U32String   = BasicString<char32_t>;
+using U16String   = BasicString<char16_t>;
+using WCharString = WString;
+using UTF32String = U32String;
+using UTF16String = U16String;
+
+template <typename T,typename BasicString<T>::SizeType SIZE>
+BasicString(TYPE<const T[SIZE]>&) -> BasicString<T>;
+
+#ifdef STD_NAMESPACE
+}
+#endif
+
+#endif
