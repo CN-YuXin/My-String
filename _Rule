@@ -1,0 +1,167 @@
+#ifndef RULE_OF_YX
+#define RULE_OF_YX
+
+#include <initializer_list>
+#include <stddef.h>
+#include <type_traits>
+#include <time.h>
+
+#ifdef STD_NAMESPACE
+namespace STD_NAMESPACE {
+#endif
+
+template <typename... Args>
+class Fn_Type_Of {
+	Fn_Type_Of() = delete;
+	template <size_t IIndex,typename IT,typename... IArgs>
+	class Arg_Result_Type {
+	  public:
+		static_assert(IIndex > 0 and IIndex < sizeof...(Args),"Index out of range");
+		using Result_Type = typename Arg_Result_Type<IIndex - 1,IArgs...>::Result_Type;
+	};
+	template <typename IT,typename... IArgs>
+	class Arg_Result_Type<0,IT,IArgs...> {
+	  public:
+		using Result_Type = IT;
+	};
+  public:
+	template <size_t Index>
+	using Arg_Type = typename Arg_Result_Type<Index,Args...>::Result_Type;
+	constexpr static unsigned short Length = sizeof...(Args);
+};
+template <typename T,typename... Args>
+class Fn_Type_Of<T(Args...)> {
+	Fn_Type_Of() = delete;
+  public:
+	template <size_t Index>
+	using Arg_Type = typename Fn_Type_Of<Args...>::template Arg_Type<Index>;
+	using Ret_Type = T;
+	using Ptr_Type = T(*)(Args...);
+	constexpr static unsigned short Length = sizeof...(Args);
+};
+template <typename T,typename... Args>
+class Fn_Type_Of<T(*)(Args...)> {
+	Fn_Type_Of() = delete;
+  public:
+	template <size_t Index>
+	using Arg_Type = typename Fn_Type_Of<Args...>::template Arg_Type<Index>;
+	using Ret_Type = T;
+	using Fn_Type = T(Args...);
+	constexpr static unsigned short Length = sizeof...(Args);
+};
+template <typename T,typename U,typename... Args>
+class Fn_Type_Of<T(U::*)(Args...)> {
+	Fn_Type_Of() = delete;
+  public:
+	template <size_t Index>
+	using Arg_Type = typename Fn_Type_Of<Args...>::template Arg_Type<Index>;
+	using Ret_Type = T;
+	constexpr static unsigned short Length = sizeof...(Args);
+};
+
+template <size_t Index,typename T,typename... Args>
+class GetType {
+	static_assert(Index <= sizeof...(Args) and Index >= 0,"Index out of range");
+  public:
+	using ResultType = typename GetType<Index - 1,Args...>::ResultType;
+};
+template <typename T,typename... Args>
+class GetType<0,T,Args...> {
+  public:
+	using ResultType = T;
+};
+template <size_t Index,typename... Args>
+using TGetType = typename GetType<Index,Args...>::Result;
+
+template <typename T>
+using TYPE = T;
+
+template <typename T,size_t SIZE>
+constexpr size_t Size(TYPE<T[SIZE]> &rarr) {
+	return SIZE;
+}
+
+template <typename T>
+constexpr size_t Size(T &&v) {
+	return v.size();
+}
+
+template <typename T,size_t SIZE>
+constexpr T* Begin(TYPE<T[SIZE]> &rarr) {
+	return rarr;
+}
+
+template <typename T>
+constexpr auto Begin(T &&v) -> typename std::remove_reference_t<decltype(v)>::iterator {
+	return v.begin();
+}
+
+template <typename T,size_t SIZE>
+constexpr T* End(TYPE<T[SIZE]> &rarr) {
+	return rarr + Size(rarr);
+}
+
+template <typename T>
+constexpr auto End(T &&v) -> typename std::remove_reference_t<decltype(v)>::iterator {
+	return v.end();
+}
+
+template <size_t Index,typename T,size_t SIZE>
+constexpr T* It_Of(TYPE<T[SIZE]> &rarr) {
+	static_assert(Index < SIZE,"Index out of range");
+	return rarr + Index;
+}
+
+template <typename T,typename U>
+void ForEach(const T &begin,const T &end,const U &fn) {
+	for (T it = begin;it != end;it++) {
+		fn(*it);
+	}
+}
+
+template <typename T,size_t SIZE,typename FN>
+void ForEach(TYPE<T[SIZE]> &rarr,FN &&fn) {
+	for (size_t i = 0;i < SIZE;i++) {
+		fn(rarr[i]);
+	}
+}
+template <typename T,typename FN>
+void ForEach(T &&value,FN &&fn) {
+	size_t Size = value.size();
+	for (size_t i = 0;i < Size;i++) {
+		fn(value[i]);
+	}
+}
+inline void Sleep(const unsigned long &tm) {
+	unsigned long end = time(nullptr) + tm;
+	for (volatile unsigned long i = 0;time(nullptr) <= end;i);
+}
+
+template <typename T>
+auto GetElement(long Index, T&& rarr) -> decltype(rarr[0]) {
+	if (Index >= 0) {
+		return rarr[Index];
+	} else {
+		return rarr[Size(rarr) + Index];
+	}
+}
+
+template <typename T>
+using PtrType = T*;
+
+using UCT  = unsigned char;
+using SCT  = signed char;
+using UST  = unsigned short;
+using SST  = signed short;
+using UIT  = unsigned;
+using SIT  = int;
+using ULT  = unsigned long;
+using SLT  = long;
+using ULLT = unsigned long long;
+using SLLT = long long;
+
+#ifdef STD_NAMESPACE
+}
+#endif
+
+#endif
