@@ -1,5 +1,5 @@
-#ifndef STRING_OF_YX
-#define STRING_OF_YX
+#ifndef STRING_OF_CD
+#define STRING_OF_CD
 
 #include <ostream>
 #include <istream>
@@ -195,16 +195,16 @@ class BasicString {
 		return _Data[0];
 	}
 	constexpr BasicString& AppEnd(T c) noexcept {
-		return Insert(Size,c);
+		return Insert(c,Size);
 	}
 	constexpr BasicString& AppEnd(const BasicString &txt) noexcept {
-		return Insert(Size,txt);
+		return Insert(txt,Size);
 	}
 	constexpr BasicString& AppBegin(T c) noexcept {
-		return Insert(0,c);
+		return Insert(c,0);
 	}
 	constexpr BasicString& AppBegin(const BasicString &txt) noexcept {
-		return Insert(0,txt);
+		return Insert(txt,0);
 	}
 	constexpr BasicString Copy() const noexcept {
 		return *this;
@@ -212,7 +212,7 @@ class BasicString {
 	constexpr bool IsNotEmpty() const noexcept {
 		return !IsEmpty();
 	}
-	BasicString& Insert(SizeType _in, T _c) noexcept {
+	BasicString& Insert(T _c, SizeType _in) noexcept {
 		if (_in > Size)
 			return *this;
 		bool _RN = false;
@@ -230,7 +230,7 @@ class BasicString {
 		++_Size;
 		return *this;
 	}
-	BasicString& Insert(SizeType _in, const BasicString &txt) noexcept {
+	BasicString& Insert(const BasicString &txt, SizeType _in) noexcept {
 		if (_in > Size or txt.Size == 0)
 			return *this;
 		bool _RN = false;
@@ -757,6 +757,13 @@ class BasicString {
 		}
 		_res.AppEnd((T)']');
 		return _res;
+	}
+	static BasicString ToString(const std::basic_string<T> &txt) noexcept {
+		BasicString _r(txt.size());
+		for (SizeType i = 0;i < txt.size();++i)
+			_r[i] = txt[i];
+		_r._Size = txt.size();
+		return _r;
 	}
 	static BasicString Progress(SizeType _max, decltype(_max) _cur = 0, bool _per = true, decltype(_cur) _len = 35, char _bar = '=', char _space = ' ', const BasicString &_tail = BasicString(1,(T)'>'), const BasicString &_start = BasicString(1,(T)'['), const BasicString &_end = BasicString(1,(T)']')) noexcept {
 		BasicString _r = _start;
