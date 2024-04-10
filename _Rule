@@ -10,55 +10,6 @@
 namespace STD_NAMESPACE {
 #endif
 
-template <typename... Args>
-class Fn_Type_Of {
-	Fn_Type_Of() = delete;
-	template <size_t IIndex,typename IT,typename... IArgs>
-	class Arg_Result_Type {
-	  public:
-		static_assert(IIndex > 0 and IIndex < sizeof...(Args),"Index out of range");
-		using Result_Type = typename Arg_Result_Type<IIndex - 1,IArgs...>::Result_Type;
-	};
-	template <typename IT,typename... IArgs>
-	class Arg_Result_Type<0,IT,IArgs...> {
-	  public:
-		using Result_Type = IT;
-	};
-  public:
-	template <size_t Index>
-	using Arg_Type = typename Arg_Result_Type<Index,Args...>::Result_Type;
-	constexpr static unsigned short Length = sizeof...(Args);
-};
-template <typename T,typename... Args>
-class Fn_Type_Of<T(Args...)> {
-	Fn_Type_Of() = delete;
-  public:
-	template <size_t Index>
-	using Arg_Type = typename Fn_Type_Of<Args...>::template Arg_Type<Index>;
-	using Ret_Type = T;
-	using Ptr_Type = T(*)(Args...);
-	constexpr static unsigned short Length = sizeof...(Args);
-};
-template <typename T,typename... Args>
-class Fn_Type_Of<T(*)(Args...)> {
-	Fn_Type_Of() = delete;
-  public:
-	template <size_t Index>
-	using Arg_Type = typename Fn_Type_Of<Args...>::template Arg_Type<Index>;
-	using Ret_Type = T;
-	using Fn_Type = T(Args...);
-	constexpr static unsigned short Length = sizeof...(Args);
-};
-template <typename T,typename U,typename... Args>
-class Fn_Type_Of<T(U::*)(Args...)> {
-	Fn_Type_Of() = delete;
-  public:
-	template <size_t Index>
-	using Arg_Type = typename Fn_Type_Of<Args...>::template Arg_Type<Index>;
-	using Ret_Type = T;
-	constexpr static unsigned short Length = sizeof...(Args);
-};
-
 template <size_t Index,typename T,typename... Args>
 class GetType {
 	static_assert(Index <= sizeof...(Args) and Index >= 0,"Index out of range");
@@ -71,7 +22,7 @@ class GetType<0,T,Args...> {
 	using ResultType = T;
 };
 template <size_t Index,typename... Args>
-using TGetType = typename GetType<Index,Args...>::Result;
+using TGetType = typename GetType<Index,Args...>::ResultType;
 
 template <typename T>
 using TYPE = T;

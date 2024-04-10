@@ -1,0 +1,68 @@
+#ifndef REVERSE_ITERATOR_OF_YX
+#define REVERSE_ITERATOR_OF_YX
+
+#ifdef STD_NAMESPACE
+namespace STD_NAMESPACE {
+#endif
+
+template <typename T>
+class reverseIterator {
+	T it;
+  public:
+	reverseIterator(const decltype(it)& v):
+		it(v) {
+	}
+	constexpr bool operator==(const T& v) const volatile noexcept {
+		return it == v;
+	}
+	constexpr bool operator!=(const T& v) const volatile noexcept {
+		return !(*this == v);
+	}
+	constexpr bool operator==(const volatile reverseIterator& v) const volatile noexcept {
+	    return v.it == it;
+	}
+	constexpr bool operator!=(const volatile reverseIterator&& v) const volatile noexcept {
+	    return !(*this == v);
+	}
+	constexpr auto operator++(int) volatile noexcept {
+		return it--;
+	}
+	constexpr auto& operator++() volatile noexcept {
+		return --it;
+	}
+	constexpr auto operator--(int) volatile noexcept {
+		return it++;
+	}
+	constexpr auto& operator--() volatile noexcept {
+		return --it;
+	}
+	template <typename U>
+	constexpr auto operator+(U&& v) const volatile noexcept {
+		return it - v;
+	}
+	template <typename U>
+	constexpr auto operator-(U&& v) const volatile noexcept {
+		return it + v;
+	}
+	template <typename U>
+	constexpr auto& operator+=(U&& v) volatile noexcept {
+		return it -= v;
+	}
+	template <typename U>
+	constexpr auto& operator-=(U&& v) volatile noexcept {
+		return it += v;
+	}
+	template <typename U>
+	constexpr auto& operator*=(U&& v) volatile noexcept {
+		return it *= v;
+	}
+	constexpr auto& operator*() const volatile noexcept {
+		return *it;
+	}
+};
+
+#ifdef STD_NAMESPACE
+}
+#endif
+
+#endif
