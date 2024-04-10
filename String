@@ -215,7 +215,7 @@ class BasicString {
 	constexpr BasicString& appBegin(const BasicString &txt) noexcept {
 		return insert(txt,0);
 	}
-	constexpr BasicString Copy() const noexcept {
+	constexpr BasicString copy() const noexcept {
 		return *this;
 	}
 	constexpr bool isNotEmpty() const noexcept {
