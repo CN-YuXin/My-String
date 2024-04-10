@@ -352,7 +352,7 @@ class BasicString {
 	sizeType rightFindIf(F &&fn) const noexcept {
 		return rightFindIf(fn,0,size);
 	}
-	sizeType Count(T _c, sizeType _b, sizeType _e) const noexcept {
+	sizeType count(T _c, sizeType _b, sizeType _e) const noexcept {
 		if (_e <= _b)
 			return 0;
 		sizeType _count = 0;
@@ -365,10 +365,10 @@ class BasicString {
 		}
 		return _count;
 	}
-	sizeType Count(T _c) const noexcept {
-		return Count(_c,0,size);
+	sizeType count(T _c) const noexcept {
+		return count(_c,0,size);
 	}
-	sizeType Count(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
+	sizeType count(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
 		if (_e <= _b or _e < text.size)
 			return 0;
 		sizeType _count = 0;
@@ -381,8 +381,8 @@ class BasicString {
 		}
 		return _count;	
 	}
-	sizeType Count(const BasicString &txt) const noexcept {
-		return Count(txt,0,size);
+	sizeType count(const BasicString &txt) const noexcept {
+		return count(txt,0,size);
 	}
 	sizeType erase(sizeType _in) noexcept {
 		for (sizeType i = _in;i + 1 < size;++i)
@@ -426,7 +426,7 @@ class BasicString {
 	sizeType erase(const BasicString &txt) noexcept {
 		return erase(0,size,txt);
 	}
-	sizeType Fill(sizeType _b, sizeType _e , T _c) noexcept {
+	sizeType fill(sizeType _b, sizeType _e , T _c) noexcept {
 		for (sizeType i = _b;i < _e and i < size;++i)
 			_data[i] = _c;
 		if (_e <= _b)
