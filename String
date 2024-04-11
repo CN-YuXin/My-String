@@ -4,10 +4,12 @@
 #include <ostream>
 #include <istream>
 #include <type_traits>
-#include <_Rule>
 #include <string>
 #include <initializer_list>
-#include <reverseIterator>
+#include <ReverseIterator>
+
+template <typename T>
+using TYPE = T;
 
 #ifdef STD_NAMESPACE
 namespace STD_NAMESPACE {
@@ -25,7 +27,7 @@ class BasicString {
 	using charType             = T;
 	using iterator             = T*;
 	using constIterator        = const T*;
-	using reverseIterator      = reverseIterator<iterator>;
+	using reverseIterator      = ReverseIterator<iterator>;
 	using constReverseIterator = const reverseIterator;
 	const sizeType &length,
 		&size,
