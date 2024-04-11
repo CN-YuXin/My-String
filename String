@@ -600,7 +600,7 @@ class BasicString {
 				return false;
 		return true;
 	}
-	short compare(const BasicString &txt) const noexcept {
+	Byte compare(const BasicString &txt) const noexcept {
 		if (size < txt.size)
 			return -1;
 		else if (size > txt.size)

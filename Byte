@@ -1,0 +1,137 @@
+#ifndef BYTE_OF_YX
+#define BYTE_OF_YX
+
+#include <ostream>
+
+#ifdef STD_NAMESPACE
+namespace STD_NAMESPACE {
+#endif
+
+template <bool SIG = true>
+class Byte {
+	signed char value;
+  public:
+	Byte() {
+	}
+	constexpr Byte(decltype(value) v): value(v) {
+	}
+	constexpr operator decltype(value)&() & noexcept {
+		return value;
+	}
+	constexpr operator const decltype(value)&() const & noexcept {
+		return value;
+	}
+	constexpr operator volatile decltype(value)&() volatile & noexcept {
+		return value;
+	}
+	constexpr operator const volatile decltype(value)&() const volatile & noexcept {
+		return value;
+	}
+	constexpr operator decltype(value)&&() && noexcept {
+		return (decltype(value)&&)value;
+	}
+	constexpr operator const decltype(value)&&() const && noexcept {
+		return (decltype(value)&&)value;
+	}
+	constexpr operator volatile decltype(value)&&() volatile && noexcept {
+		return (decltype(value)&&)value;
+	}
+	constexpr operator const volatile decltype(value)&&() const volatile && noexcept {
+		return (decltype(value)&&)value;
+	}
+	volatile Byte& operator=(const volatile Byte& v) volatile & noexcept {
+		value = v.value;
+		return *this;
+	}
+	volatile Byte& operator=(const volatile Byte&& v) volatile & noexcept {
+		value = v.value;
+		return *this;
+	}
+	template <typename T>
+	friend auto& operator<<(std::basic_ostream<T>& cout, const Byte& v) noexcept {
+		cout << (int)v.value;
+		return cout;
+	}
+	template <typename T>
+	friend auto& operator<<(std::basic_ostream<T>& cout, const volatile Byte& v) noexcept {
+		cout << (int)v.value;
+		return cout;
+	}
+	template <typename T>
+	friend auto& operator>>(std::basic_istream<T> &cin, const Byte& v) noexcept {
+		cin >> ((short&)v.value);
+		return cin;
+	}
+	template <typename T>
+	friend auto& operator>>(std::basic_istream<T> &cin, const volatile Byte& v) noexcept {
+		cin >> ((short&)v.value);
+		return cin;
+	}
+};
+template <>
+class Byte<false> {
+	unsigned char value;
+  public:
+	Byte() {
+	}
+	constexpr Byte(decltype(value) v): value(v) {
+	}
+	constexpr operator decltype(value)&() & noexcept {
+		return value;
+	}
+	constexpr operator const decltype(value)&() const & noexcept {
+		return value;
+	}
+	constexpr operator volatile decltype(value)&() volatile & noexcept {
+		return value;
+	}
+	constexpr operator const volatile decltype(value)&() const volatile & noexcept {
+		return value;
+	}
+	constexpr operator decltype(value)&&() && noexcept {
+		return (decltype(value)&&)value;
+	}
+	constexpr operator const decltype(value)&&() const && noexcept {
+		return (decltype(value)&&)value;
+	}
+	constexpr operator volatile decltype(value)&&() volatile && noexcept {
+		return (decltype(value)&&)value;
+	}
+	constexpr operator const volatile decltype(value)&&() const volatile && noexcept {
+		return (decltype(value)&&)value;
+	}
+	volatile Byte& operator=(const volatile Byte& v) volatile & noexcept {
+		value = v.value;
+		return *this;
+	}
+	volatile Byte& operator=(const volatile Byte&& v) volatile & noexcept {
+		value = v.value;
+		return *this;
+	}
+	template <typename T>
+	friend auto& operator<<(std::basic_ostream<T>& cout, const Byte& v) noexcept {
+		cout << (int)v.value;
+		return cout;
+	}
+	template <typename T>
+	friend auto& operator<<(std::basic_ostream<T>& cout, const volatile Byte& v) noexcept {
+		cout << (int)v.value;
+		return cout;
+	}
+	template <typename T>
+	friend auto& operator>>(std::basic_istream<T> &cin, const Byte& v) noexcept {
+		cin >> ((short&)v.value);
+		return cin;
+	}
+	template <typename T>
+	friend auto& operator>>(std::basic_istream<T> &cin, const volatile Byte& v) noexcept {
+		cin >> ((short&)v.value);
+		return cin;
+	}
+};
+
+#ifdef STD_NAMESPACE
+}
+#endif
+
+#endif
