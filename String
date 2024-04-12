@@ -229,11 +229,10 @@ class BasicString {
 			return *this;
 		bool _RN = false;
 		if (size == capacity) {
-			if (_in == 0)
+			if (_in == 0) {
 				reNew(1);
-			else
+			} else
 				reNew();
-			_RN = true;
 		}
 		if ((_RN and _in != 0) or !_RN)
 			for (sizeType i = size;i > _in;--i)
@@ -295,6 +294,8 @@ class BasicString {
 		};
 	}
 	sizeType find(T _char, sizeType _b, sizeType _e) const noexcept {
+		if (_e <= _b or _b >= size or _e > size)
+			return -1;
 		for (sizeType i = _b;i < _e;++i)
 			if (_data[i] == _char)
 				return i;
@@ -325,6 +326,8 @@ class BasicString {
 		return findIf(fn,0,size - 1);
 	}
 	sizeType rightFind(T _c, sizeType _b, sizeType _e) const noexcept {
+		if (_e <= _b or _b >= size or _e > size)
+			return -1;
 		for (sizeType i = _e - 1;i < _e and i >= _b;++i)
 			if (_data[i] == _c)
 				return i;
@@ -637,7 +640,7 @@ class BasicString {
 		return getLine(cin,capacity,_e);
 	}
 	BasicString& operator=(const BasicString &as) noexcept {
-		if (_size < as.size)
+		if (_capacity < as.size)
 			reNew(0,as.size);
 		for (sizeType i = 0;i < as.size;++i)
 			_data[i] = as[i];
@@ -872,7 +875,7 @@ class BasicString {
 		return data;
 	}
 	void reNew(sizeType index, sizeType d) noexcept {
-		sizeType newCap = (d * 2 - d / 2);
+		sizeType newCap = (d == 0 ? 15 : (d * 2 - d / 2));
 		T *tmp = new T[newCap];
 		
 		for (sizeType i = index;i < size + index;++i) {
@@ -884,7 +887,7 @@ class BasicString {
 		_capacity = newCap;
 	}
 	void reNew(sizeType index = 0) noexcept {
-		reNew(index, (_capacity * 2 - _capacity / 2));
+		reNew(index,_capacity);
 	}
 };
 using String      = BasicString<char>;
