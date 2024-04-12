@@ -733,7 +733,7 @@ class BasicString {
 	}
 	template <typename VALUE>
 	bool equals(VALUE&& v) const noexcept {
-		if constexpr (!std::is_same_v<std::remove_reference_t<decltype(v)>,BasicString>) {
+		if constexpr (!std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(v)>>,BasicString>) {
 			return false;
 		} else {
 			if (size != v.size)
