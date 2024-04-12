@@ -601,12 +601,17 @@ class BasicString {
 	IT toInteger() const noexcept {
 		return toInteger(0,size);
 	}
-	bool equals(const BasicString &eq) const noexcept {
-		if (size != eq.size)
+	template <typename VALUE>
+	bool equals(VALUE&& v) const noexcept {
+		if constexpr (!std::is_same_v<std::remove_reference_t<decltype(v)>,BasicString>) {
 			return false;
-		for (sizeType i = 0;i < size;++i)
-			if (_data[i] != eq[i])
+		} else {
+			if (size != v.size)
 				return false;
+			for (sizeType i = 0;i < size;++i)
+				if (_data[i] != v[i])
+					return false;
+		}
 		return true;
 	}
 	Byte<> compare(const BasicString &txt) const noexcept {
