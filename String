@@ -217,11 +217,19 @@ class BasicString {
 	constexpr BasicString& appEnd(const BasicString &txt) noexcept {
 		return insert(txt,size);
 	}
+	template <sizeType SIZE>
+	constexpr BasicString& appEnd(TYPE<const T[SIZE]> &rarr) noexcept {
+		return insert(rarr,size);
+	}
 	constexpr BasicString& appBegin(T c) noexcept {
 		return insert(c,0);
 	}
 	constexpr BasicString& appBegin(const BasicString &txt) noexcept {
 		return insert(txt,0);
+	}
+	template <sizeType SIZE>
+	constexpr BasicString& appBegin(TYPE<const T[SIZE]> &rarr) noexcept {
+		return insert(rarr,0);
 	}
 	constexpr BasicString copy() const noexcept {
 		return *this;
