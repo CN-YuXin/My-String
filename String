@@ -236,10 +236,11 @@ class BasicString {
 		if (size == capacity) {
 			if (_in == 0) {
 				reNew(1);
+				_RN = true;
 			} else
 				reNew();
 		}
-		if ((_RN and _in != 0) or !_RN)
+		if (!_RN)
 			for (sizeType i = size;i > _in;--i)
 				_data[i] = _data[i - 1];
 		_data[_in] = _c;
@@ -265,6 +266,26 @@ class BasicString {
 		_size += txt.size;
 		return *this;
 	}
+	template <sizeType SIZE>
+	BasicString& insert(TYPE<const T[SIZE]> &rarr, sizeType _in) noexcept {
+		if (_in > size or SIZE - 1 == 0)
+			return *this;
+		bool _RN = false;
+		if (size + SIZE - 1 > capacity) {
+			if (_in == 0)
+				reNew(SIZE - 1,SIZE - 1 + size);
+			else
+				reNew(0,SIZE - 1 + size);
+			_RN = true;
+		}
+		if ((_RN and _in != 0) or !_RN)
+			for (sizeType i = size + (SIZE - 2);i > _in + (SIZE - 2);--i)
+				_data[i] = _data[i - (SIZE - 1)];
+		for (sizeType i = _in;i < _in + SIZE - 1;++i)
+			_data[i] = rarr[i - _in];
+		_size += SIZE - 1;
+		return *this;
+	}
 	bool isEmpty() const noexcept {
 		if (size == 0)
 			return true;
@@ -281,9 +302,9 @@ class BasicString {
 			return *this;
 		--end;
 		for (;begin != end and end > begin;++begin,--end) {
-			_data[begin] ^= _data[end];
-			_data[end]    = _data[begin] ^ _data[end];
-			_data[begin] ^= _data[end];
+			T tmp        = _data[begin];
+			_data[begin] = _data[end];
+			_data[end]   = tmp;
 		}
 		return *this;
 	}
@@ -306,7 +327,7 @@ class BasicString {
 				return i;
 		return -1;
 	}
-	sizeType find(T _c) const noexcept {
+	constexpr sizeType find(T _c) const noexcept {
 		return find(_c,0,size);
 	}
 	sizeType find(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
@@ -316,8 +337,20 @@ class BasicString {
 					return i;
 		return -1;
 	}
-	sizeType find(const BasicString &t) const noexcept {
+	template <sizeType SIZE>
+	sizeType find(TYPE<const T[SIZE]> &rarr, sizeType _b, sizeType _e) const noexcept {
+		for (sizeType i = _b;(i < _e and i < size) and i + SIZE - 1 <= _e;++i)
+			for (sizeType j = i;j < _e and j - i < SIZE - 1 and _data[j] == rarr[j - i];++j)
+				if (j - i == SIZE - 2)
+					return i;
+		return -1;
+	}
+	constexpr sizeType find(const BasicString &t) const noexcept {
 		return find(t,0,size);
+	}
+	template <sizeType SIZE>
+	constexpr sizeType find(TYPE<const T[SIZE]> &rarr) const noexcept {
+		return find(rarr,0,size);
 	}
 	template <typename F>
 	sizeType findIf(F &&fn, sizeType _b, sizeType _e) const noexcept {
@@ -327,7 +360,7 @@ class BasicString {
 		return -1;
 	}
 	template <typename F>
-	sizeType findIf(F &&fn) const noexcept {
+	constexpr sizeType findIf(F &&fn) const noexcept {
 		return findIf(fn,0,size - 1);
 	}
 	sizeType rightFind(T _c, sizeType _b, sizeType _e) const noexcept {
@@ -338,7 +371,7 @@ class BasicString {
 				return i;
 		return -1;
 	}
-	sizeType rightFind(T _c) const noexcept {
+	constexpr sizeType rightFind(T _c) const noexcept {
 		return rightFind(_c,0,size);
 	}
 	sizeType rightFind(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
@@ -349,8 +382,21 @@ class BasicString {
 		 }
 		return -1;
 	}
-	sizeType rightFind(const BasicString &text) const noexcept {
+	template <sizeType SIZE>
+	sizeType rightFind(TYPE<const T[SIZE]> &rarr, sizeType _b, sizeType _e) const noexcept {
+		for (sizeType i = _e - SIZE - 1;i >= _b and i < _e and i < size;--i) {
+			for (sizeType j = i;j < _e and j - i < SIZE - 1 and _data[j] == rarr[j - i];++j)
+				if (j - i == SIZE - 2)
+					return i;
+		 }
+		return -1;
+	}
+	constexpr sizeType rightFind(const BasicString &text) const noexcept {
 		return rightFind(text,0,size);
+	}
+	template <sizeType SIZE>
+	constexpr sizeType rightFind(TYPE<const T[SIZE]> &rarr) const noexcept {
+		return rightFind(rarr,0,size);
 	}
 	template <typename F>
 	sizeType rightFindIf(F &&fn, sizeType _b, sizeType _e) const noexcept {
@@ -360,7 +406,7 @@ class BasicString {
 		return -1;
 	}
 	template <typename F>
-	sizeType rightFindIf(F &&fn) const noexcept {
+	constexpr sizeType rightFindIf(F &&fn) const noexcept {
 		return rightFindIf(fn,0,size);
 	}
 	sizeType count(T _c, sizeType _b, sizeType _e) const noexcept {
@@ -376,7 +422,7 @@ class BasicString {
 		}
 		return _count;
 	}
-	sizeType count(T _c) const noexcept {
+	constexpr sizeType count(T _c) const noexcept {
 		return count(_c,0,size);
 	}
 	sizeType count(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
@@ -392,8 +438,26 @@ class BasicString {
 		}
 		return _count;	
 	}
-	sizeType count(const BasicString &txt) const noexcept {
+	template <sizeType SIZE>
+	sizeType count(TYPE<const T[SIZE]> &rarr, sizeType _b, sizeType _e) const noexcept {
+		if (_e <= _b or _e < SIZE - 1)
+			return 0;
+		sizeType _count = 0;
+		for (sizeType i = _b;i <= _e - SIZE - 1 and i < size;) {
+			sizeType _res = find(rarr,i,_e);
+			if (_res != -1) {
+				i = (++_count,_res + SIZE - 1);
+			} else
+				break;
+		}
+		return _count;	
+	}
+	constexpr sizeType count(const BasicString &txt) const noexcept {
 		return count(txt,0,size);
+	}
+	template <sizeType SIZE>
+	constexpr sizeType count(TYPE<const T[SIZE]> &rarr) const noexcept {
+		return count(rarr,0,size);
 	}
 	sizeType erase(sizeType _in) noexcept {
 		for (sizeType i = _in;i + 1 < size;++i)
@@ -434,8 +498,25 @@ class BasicString {
 		}
 		return _count;
 	}
-	sizeType erase(const BasicString &txt) noexcept {
+	template <sizeType SIZE>
+	sizeType erase(sizeType b, sizeType e, TYPE<const T[SIZE]> &rarr) noexcept {
+		sizeType _count = 0;
+		while (true) {
+			sizeType _res = find(rarr,b,e);
+			if (_res != -1) {
+				erase(_res,_res + SIZE - 1);
+				e -= (SIZE - 1,++_count);
+			} else
+				break;
+		}
+		return _count;
+	}
+	constexpr sizeType erase(const BasicString &txt) noexcept {
 		return erase(0,size,txt);
+	}
+	template <sizeType SIZE>
+	constexpr sizeType erase(TYPE<const T[SIZE]> &rarr) noexcept {
+		return erase(0,size,rarr);
 	}
 	sizeType fill(sizeType _b, sizeType _e , T _c) noexcept {
 		for (sizeType i = _b;i < _e and i < size;++i)
@@ -450,7 +531,7 @@ class BasicString {
 				_data[i] = _rep;
 		return *this;
 	}
-	BasicString& replace(T r, T c) noexcept {
+	constexpr BasicString& replace(T r, T c) noexcept {
 		return replace(r,0,size,c);
 	}
 	BasicString& replace(const BasicString &txt, sizeType b, sizeType e, T c) noexcept {
@@ -466,8 +547,26 @@ class BasicString {
 		}
 		return *this;
 	}
-	BasicString& replace(const BasicString &txt, T _c) noexcept {
+	template <sizeType SIZE>
+	BasicString& replace(TYPE<const T[SIZE]> &rarr, sizeType b, sizeType e, T c) noexcept {
+		while (true) {
+			sizeType _res = find(c,b,e);
+			if (_res != -1) {
+				erase(_res);
+				insert(_res,rarr);
+				e += (SIZE - 2);
+				b += SIZE - 1;
+			} else
+				break;
+		}
+		return *this;
+	}
+	constexpr BasicString& replace(const BasicString &txt, T _c) noexcept {
 		return replace(txt,0,size,_c);
+	}
+	template <sizeType SIZE>
+	constexpr BasicString& replace(TYPE<const T[SIZE]> &rarr, T _c) noexcept {
+		return replace(rarr,0,size,_c);
 	}
 	BasicString& replace(const BasicString &txt, sizeType b, sizeType e, const BasicString &str) noexcept {
 		while (true) {
@@ -487,8 +586,31 @@ class BasicString {
 		}
 		return *this;
 	}
-	BasicString& replace(const BasicString &txt, const BasicString &str) noexcept {
+	template <sizeType SIZE, sizeType SIZE2>
+	BasicString& replace(TYPE<const T[SIZE]> &rarr, sizeType b, sizeType e, TYPE<T[SIZE2]> &str) noexcept {
+		while (true) {
+			sizeType _res = find(str,b,e);
+			if (_res != -1) {
+				sizeType tmp = size;
+				erase(_res,_res + SIZE2 - 1);
+				insert(_res,rarr);
+				if (size < tmp) {
+					e -= ((SIZE2 - 1) - (SIZE - 1));
+				} else if (size > tmp) {
+					e += ((SIZE - 1) - (SIZE2 - 1));
+				}
+				b = _res + SIZE - 1;
+			} else
+				break;
+		}
+		return *this;
+	}
+	constexpr BasicString& replace(const BasicString &txt, const BasicString &str) noexcept {
 		return replace(txt,0,size,str);
+	}
+	template <sizeType SIZE, sizeType SIZE2>
+	constexpr BasicString& replace(TYPE<const T[SIZE]> &rarr, TYPE<T[SIZE2]> &str) noexcept {
+		return replace(rarr,0,size,str);
 	}
 	BasicString& toUpperCase(sizeType _b, sizeType _e) noexcept {
 		for (sizeType i = _b;i < _e and i < size;++i)
@@ -496,7 +618,7 @@ class BasicString {
 				_data[i] -= 32;
 		return *this;
 	}
-	BasicString& toUpperCase() noexcept {
+	constexpr BasicString& toUpperCase() noexcept {
 		return toUpperCase(0,size);
 	}
 	BasicString& toLowerCase(sizeType _b, sizeType _e) noexcept {
@@ -505,7 +627,7 @@ class BasicString {
 				_data[i] += 32;
 		return *this;
 	}
-	BasicString& toLowerCase() noexcept {
+	constexpr BasicString& toLowerCase() noexcept {
 		return toLowerCase(0,size);
 	}
 	bool isInteger(sizeType _b, sizeType _e) const noexcept {
@@ -519,7 +641,7 @@ class BasicString {
 				return false;
 		return true;
 	}
-	bool isInteger() const noexcept {
+	constexpr bool isInteger() const noexcept {
 		return isInteger(0,size);
 	}
 	bool hasInteger(sizeType _b, sizeType _e) const noexcept {
@@ -528,7 +650,7 @@ class BasicString {
 				return true;
 		return false;
 	}
-	bool hasInteger() const noexcept {
+	constexpr bool hasInteger() const noexcept {
 		return hasInteger(0,size);
 	}
 	bool isChar(sizeType _b, sizeType _e) const noexcept {
@@ -537,7 +659,7 @@ class BasicString {
 				return false;
 		return true;
 	}
-	bool isChar() const noexcept {
+	constexpr bool isChar() const noexcept {
 		return isChar(0,size);
 	}
 	bool hasChar(sizeType _b, sizeType _e) const noexcept {
@@ -546,7 +668,7 @@ class BasicString {
 				return true;
 		return false;
 	}
-	bool hasChar() const noexcept {
+	constexpr bool hasChar() const noexcept {
 		return hasChar(0,size);
 	}
 	bool isLetter(sizeType _b, sizeType _e) const noexcept {
@@ -555,7 +677,7 @@ class BasicString {
 				return false;
 		return true;
 	}
-	bool isLetter() const noexcept {
+	constexpr bool isLetter() const noexcept {
 		return isLetter(0,size);
 	}
 	bool hasLetter(sizeType _b, sizeType _e) const noexcept {
@@ -564,7 +686,7 @@ class BasicString {
 				return true;
 		return false;
 	}
-	bool hasLetter() const noexcept {
+	constexpr bool hasLetter() const noexcept {
 		return hasLetter(0,size);
 	}
 	std::string toStdString(sizeType _b, sizeType _e) const noexcept {
@@ -598,7 +720,7 @@ class BasicString {
 		return _smal ? -_res : _res;
 	}
 	template <typename IT = int>
-	IT toInteger() const noexcept {
+	constexpr IT toInteger() const noexcept {
 		return toInteger(0,size);
 	}
 	template <typename VALUE>
@@ -643,10 +765,10 @@ class BasicString {
 				(*this) = (BasicString(_txt,0,i + 1));
 		return *this;
 	}
-	auto& getLine(std::basic_istream<T> &cin) noexcept {
+	constexpr auto& getLine(std::basic_istream<T> &cin) noexcept {
 		return getLine(cin,capacity);
 	}
-	auto& getLine(std::basic_istream<T> &cin,char _e) noexcept {
+	constexpr auto& getLine(std::basic_istream<T> &cin,char _e) noexcept {
 		return getLine(cin,capacity,_e);
 	}
 	BasicString& operator=(const BasicString &as) noexcept {
@@ -655,6 +777,15 @@ class BasicString {
 		for (sizeType i = 0;i < as.size;++i)
 			_data[i] = as[i];
 		_size = as.size;
+		return *this;
+	}
+	template <sizeType SIZE>
+	BasicString& operator=(TYPE<const T[SIZE]> &rarr) noexcept {
+		if (_capacity < SIZE - 1)
+			reNew(0,SIZE - 1);
+		for (sizeType i = 0;i < SIZE - 1;++i)
+			_data[i] = rarr[i];
+		_size = SIZE - 1;
 		return *this;
 	}
 	BasicString& operator=(BasicString &&move) noexcept {
@@ -888,9 +1019,7 @@ class BasicString {
 		sizeType newCap = (d == 0 ? 15 : (d * 2 - d / 2));
 		T *tmp = new T[newCap];
 		
-		for (sizeType i = index;i < size + index;++i) {
-			tmp[i] = _data[i - index];
-		}
+		memcpy(tmp + index,_data,size);
 		
 		delete [] _data;
 		_data = tmp;
