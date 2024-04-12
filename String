@@ -744,6 +744,15 @@ class BasicString {
 		}
 		return true;
 	}
+	template <sizeType SIZE>
+	bool equals(TYPE<const T[SIZE]> &rarr) const noexcept {
+		if (size != SIZE - 1)
+			return false;
+		for (sizeType i = 0;i < size;++i)
+			if (_data[i] != rarr[i])
+				return false;
+		return true;
+	}
 	Byte<> compare(const BasicString &txt) const noexcept {
 		if (size < txt.size)
 			return -1;
