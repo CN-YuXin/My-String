@@ -23,6 +23,11 @@ class BasicString {
 		or std::is_same_v<T,char32_t>
 		or std::is_same_v<T,char16_t>,
 		"Illegal type");
+	static_assert(std::is_same_v<SIZE_TYPE,unsigned short>
+		or std::is_same_v<SIZE_TYPE,unsigned int>
+		or std::is_same_v<SIZE_TYPE,unsigned long>
+		or std::is_same_v<SIZE_TYPE,unsigned long long>,
+		"Illegal type");
  public:
 	using sizeType             = SIZE_TYPE;
 	using charType             = T;
@@ -328,7 +333,7 @@ class BasicString {
 	sizeType rightFind(T _c, sizeType _b, sizeType _e) const noexcept {
 		if (_e <= _b or _b >= size or _e > size)
 			return -1;
-		for (sizeType i = _e - 1;i < _e and i >= _b;++i)
+		for (sizeType i = _e - 1;i < _e and i >= _b;--i)
 			if (_data[i] == _c)
 				return i;
 		return -1;
@@ -895,8 +900,6 @@ using WString     = BasicString<wchar_t>;
 using U32String   = BasicString<char32_t>;
 using U16String   = BasicString<char16_t>;
 using WCharString = WString;
-using UTF32String = U32String;
-using UTF16String = U16String;
 
 template <typename T,typename BasicString<T>::sizeType SIZE>
 BasicString(TYPE<const T[SIZE]>&) -> BasicString<T>;
