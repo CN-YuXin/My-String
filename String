@@ -339,6 +339,8 @@ class BasicString {
 		return find(_c,0,size);
 	}
 	sizeType find(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
+		if (text.size == 0)
+			return -1;
 		for (sizeType i = _b;(i < _e and i < size) and i + text.size <= _e;++i)
 			for (sizeType j = i;j < _e and j - i < text.size and _data[j] == text[j - i];++j)
 				if (j - i == text.size - 1)
@@ -347,6 +349,8 @@ class BasicString {
 	}
 	template <sizeType SIZE>
 	sizeType find(TYPE<const T[SIZE]> &rarr, sizeType _b, sizeType _e) const noexcept {
+		if (SIZE - 1 == 0)
+			return -1;
 		for (sizeType i = _b;(i < _e and i < size) and i + SIZE - 1 <= _e;++i)
 			for (sizeType j = i;j < _e and j - i < SIZE - 1 and _data[j] == rarr[j - i];++j)
 				if (j - i == SIZE - 2)
@@ -383,7 +387,9 @@ class BasicString {
 		return rightFind(_c,0,size);
 	}
 	sizeType rightFind(const BasicString &text, sizeType _b, sizeType _e) const noexcept {
-		for (sizeType i = _e - text.size;i >= _b and i < _e and i < size;--i) {
+		if (text.size == 0)
+			return -1;
+		for (sizeType i = _e - text.size + 1;i >= _b and i < _e and i < size;--i) {
 			for (sizeType j = i;j < _e and j - i < text.size and _data[j] == text[j - i];++j)
 				if (j - i == text.size - 1)
 					return i;
@@ -392,11 +398,13 @@ class BasicString {
 	}
 	template <sizeType SIZE>
 	sizeType rightFind(TYPE<const T[SIZE]> &rarr, sizeType _b, sizeType _e) const noexcept {
-		for (sizeType i = _e - SIZE - 1;i >= _b and i < _e and i < size;--i) {
+		if (SIZE - 1 == 0)
+			return -1;
+		for (sizeType i = _e - (SIZE - 2);i >= _b and i < _e and i < size;--i) {
 			for (sizeType j = i;j < _e and j - i < SIZE - 1 and _data[j] == rarr[j - i];++j)
 				if (j - i == SIZE - 2)
 					return i;
-		 }
+		}
 		return -1;
 	}
 	constexpr sizeType rightFind(const BasicString &text) const noexcept {
@@ -451,7 +459,7 @@ class BasicString {
 		if (_e <= _b or _e < SIZE - 1)
 			return 0;
 		sizeType _count = 0;
-		for (sizeType i = _b;i <= _e - SIZE - 1 and i < size;) {
+		for (sizeType i = _b;i <= _e - (SIZE - 1) and i < size;) {
 			sizeType _res = find(rarr,i,_e);
 			if (_res != -1) {
 				i = (++_count,_res + SIZE - 1);
