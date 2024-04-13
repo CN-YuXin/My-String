@@ -12,17 +12,17 @@ class ReverseIterator {
 	ReverseIterator(const decltype(it)& v):
 		it(v) {
 	}
-	constexpr bool operator==(const T& v) const volatile noexcept {
-		return it == v;
+	constexpr operator decltype(it)&() const volatile noexcept {
+		return it;
 	}
-	constexpr bool operator!=(const T& v) const volatile noexcept {
-		return !(*this == v);
+	constexpr operator decltype(it)&() const noexcept {
+		return it;
 	}
-	constexpr bool operator==(const volatile ReverseIterator& v) const volatile noexcept {
-	    return v.it == it;
+	constexpr operator decltype(it)&() volatile noexcept {
+		return it;
 	}
-	constexpr bool operator!=(const volatile ReverseIterator&& v) const volatile noexcept {
-	    return !(*this == v);
+	constexpr operator decltype(it)&() noexcept {
+		return it;
 	}
 	constexpr auto operator++(int) volatile noexcept {
 		return it--;
@@ -51,13 +51,6 @@ class ReverseIterator {
 	template <typename U>
 	constexpr auto& operator-=(U&& v) volatile noexcept {
 		return it += v;
-	}
-	template <typename U>
-	constexpr auto& operator*=(U&& v) volatile noexcept {
-		return it *= v;
-	}
-	constexpr auto& operator*() const volatile noexcept {
-		return *it;
 	}
 };
 
