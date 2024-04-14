@@ -10,7 +10,9 @@
 #include <Byte>
 #include <CppVersion>
 
-#if _CPP_VERSION_ < 17
+#if _CPP_VERSION_ == 0
+    #error Please use C++
+#elif _CPP_VERSION_ < 17
     #error C++ version too low
 #elif _CPP_VERSION > 17
     #waring version of C++ that is too high may cause problems
