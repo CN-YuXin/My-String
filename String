@@ -570,14 +570,15 @@ class BasicString {
 			auto _res = find(c,b,e);
 			if (_res != -1) {
 				if (capacity < size + txt.size - 1) {
-					reNew(0,size + txt.size);
+					reNew(0,size + txt.size - 1);
 				}
 				for (sizeType i = e + txt.size - 2;i >= _res + txt.size;--i)
 					_data[i] = _data[i - txt.size + 1];
 				for (sizeType i = _res;i < _res + txt.size;++i)
 					_data[i] = txt[i - _res];
 				_size += txt.size - 1;
-				break;
+				b += txt.size;
+				e += txt.size - 1;
 			} else
 				break;
 		}
@@ -594,14 +595,15 @@ class BasicString {
 			auto _res = find(c,b,e);
 			if (_res != -1) {
 				if (capacity < size + SIZE - 2) {
-					reNew(0,size + SIZE - 1);
+					reNew(0,size + SIZE - 2);
 				}
 				for (sizeType i = e + SIZE - 3;i >= _res + SIZE - 1;--i)
 					_data[i] = _data[i - (SIZE - 1) + 1];
 				for (sizeType i = _res;i < _res + SIZE - 1;++i)
 					_data[i] = rarr[i - _res];
 				_size += SIZE - 2;
-				break;
+				b += SIZE - 1;
+				e += SIZE - 2;
 			} else
 				break;
 		}
