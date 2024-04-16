@@ -306,10 +306,10 @@ class BasicString {
 		_size = 0;
 	}
 	BasicString& reverse(sizeType begin, sizeType end) noexcept {
-		if (end <= begin)
+		if (end <= begin or begin >= size)
 			return *this;
 		--end;
-		for (;begin != end and end > begin;++begin,--end) {
+		for (;end > begin;++begin,--end) {
 			T tmp        = _data[begin];
 			_data[begin] = _data[end];
 			_data[end]   = tmp;
