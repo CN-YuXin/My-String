@@ -543,6 +543,8 @@ class BasicString {
 		return erase(0,size,rarr);
 	}
 	sizeType fill(sizeType _b, sizeType _e , T _c) noexcept {
+		if (_e <= _b or size == 0 or _b >= size)
+			return -1;
 		for (sizeType i = _b;i < _e and i < size;++i)
 			_data[i] = _c;
 		if (_e <= _b)
