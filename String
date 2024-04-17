@@ -266,7 +266,7 @@ class BasicString {
 				reNew(0,txt.size + size);
 			_RN = true;
 		}
-		if ((_RN and _in != 0) or !_RN)
+		if (((_RN and _in != 0) or !_RN) and _in < size)
 			for (sizeType i = size + (txt.size - 1);i > _in + (txt.size - 1);--i)
 				_data[i] = _data[i - txt.size];
 		for (sizeType i = _in;i < _in + txt.size;++i)
@@ -286,7 +286,7 @@ class BasicString {
 				reNew(0,SIZE - 1 + size);
 			_RN = true;
 		}
-		if ((_RN and _in != 0) or !_RN)
+		if (((_RN and _in != 0) or !_RN) and _in < size)
 			for (sizeType i = size + (SIZE - 2);i > _in + (SIZE - 2);--i)
 				_data[i] = _data[i - (SIZE - 1)];
 		for (sizeType i = _in;i < _in + SIZE - 1;++i)
@@ -476,10 +476,11 @@ class BasicString {
 		return count(rarr,0,size);
 	}
 	sizeType erase(sizeType _in) noexcept {
-		if (size == 0)
+		if (size == 0 or _in >= size)
 			return -1;
-		for (sizeType i = _in;i + 1 < size;++i)
-			_data[i] = _data[i + 1];
+		if (_in != size - 1)
+			for (sizeType i = _in;i + 1 < size;++i)
+				_data[i] = _data[i + 1];
 		--_size;
 		return 1;
 	}
@@ -487,6 +488,10 @@ class BasicString {
 		if (_e <= _b or _b >= size or size == 0)
 			return -1;
 		sizeType _s = _e - _b;
+		if (_e == size) {
+			_size = _b;
+			return _s;
+		}
 		for (sizeType i = _b;i + _s < size;++i)
 			_data[i] = _data[i + _s];
 		_size -= _s;
