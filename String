@@ -240,15 +240,9 @@ class BasicString {
 	BasicString& insert(T _c, sizeType _in) noexcept {
 		if (_in > size)
 			return *this;
-		bool _RN = false;
 		if (size == capacity) {
-			if (_in == 0) {
-				reNew(1);
-				_RN = true;
-			} else
-				reNew();
-		}
-		if (!_RN)
+			reNew(_in,_in + 1);
+		} else
 			for (sizeType i = size;i > _in;--i)
 				_data[i] = _data[i - 1];
 		_data[_in] = _c;
@@ -258,15 +252,9 @@ class BasicString {
 	BasicString& insert(const BasicString &txt, sizeType _in) noexcept {
 		if (_in > size or txt.size == 0)
 			return *this;
-		bool _RN = false;
 		if (size + txt.size > capacity) {
-			if (_in == 0)
-				reNew(txt.size,txt.size + size);
-			else
-				reNew(0,txt.size + size);
-			_RN = true;
-		}
-		if (((_RN and _in != 0) or !_RN) and _in < size)
+			reNew(_in, _in + txt.size, size + txt.size);
+		} else
 			for (sizeType i = size + (txt.size - 1);i > _in + (txt.size - 1);--i)
 				_data[i] = _data[i - txt.size];
 		for (sizeType i = _in;i < _in + txt.size;++i)
@@ -278,15 +266,9 @@ class BasicString {
 	BasicString& insert(TYPE<const T[SIZE]> &rarr, sizeType _in) noexcept {
 		if (_in > size or SIZE - 1 == 0)
 			return *this;
-		bool _RN = false;
 		if (size + SIZE - 1 > capacity) {
-			if (_in == 0)
-				reNew(SIZE - 1,SIZE - 1 + size);
-			else
-				reNew(0,SIZE - 1 + size);
-			_RN = true;
-		}
-		if (((_RN and _in != 0) or !_RN) and _in < size)
+			reNew(_in, _in + SIZE - 1, size + SIZE - 1);
+		} else
 			for (sizeType i = size + (SIZE - 2);i > _in + (SIZE - 2);--i)
 				_data[i] = _data[i - (SIZE - 1)];
 		for (sizeType i = _in;i < _in + SIZE - 1;++i)
@@ -323,7 +305,7 @@ class BasicString {
 		if (cap < _capacity) {
 			return true;
 		} else {
-			reNew(0,cap);
+			reNew(0,0,cap);
 			return false;
 		};
 	}
@@ -577,9 +559,9 @@ class BasicString {
 			auto _res = find(c,b,e);
 			if (_res != -1) {
 				if (capacity < size + txt.size - 1) {
-					reNew(0,size + txt.size - 1);
-				}
-				for (sizeType i = e + txt.size - 2;i >= _res + txt.size;--i)
+					reNew(_res, _res + txt.size - 1, size + txt.size - 1);
+				} else
+					for (sizeType i = e + txt.size - 2;i >= _res + txt.size;--i)
 					_data[i] = _data[i - txt.size + 1];
 				for (sizeType i = _res;i < _res + txt.size;++i)
 					_data[i] = txt[i - _res];
@@ -602,9 +584,9 @@ class BasicString {
 			auto _res = find(c,b,e);
 			if (_res != -1) {
 				if (capacity < size + SIZE - 2) {
-					reNew(0,size + SIZE - 2);
-				}
-				for (sizeType i = e + SIZE - 3;i >= _res + SIZE - 1;--i)
+					reNew(_res, _res + SIZE - 2, size + SIZE - 2);
+				} else
+					for (sizeType i = e + SIZE - 3;i >= _res + SIZE - 1;--i)
 					_data[i] = _data[i - (SIZE - 1) + 1];
 				for (sizeType i = _res;i < _res + SIZE - 1;++i)
 					_data[i] = rarr[i - _res];
@@ -635,18 +617,18 @@ class BasicString {
 		while (true) {
 			sizeType _res = find(str,b,e);
 			if (_res != -1) {
-				if (txt.size > str.size and capacity < size + txt.size - str.size) {
-					reNew(0,size + (txt.size - str.size));
-				}
 				if (txt.size == str.size) {
 					for (sizeType i = _res;i < _res + txt.size;++i)
-						_data[i] = txt[i - _res];
+							_data[i] = txt[i - _res];
 					for (sizeType i = _res;i < _res + txt.size;++i)
 						_data[i] = txt[i - _res];
 					b = _res + txt.size;
 				} else if (txt.size > str.size) {
-					for (sizeType i = (e + txt.size - str.size) - 1;i >= _res + (txt.size - str.size) + 1;--i)
-						_data[i] = _data[i - (txt.size - str.size)];
+					if (capacity < size + txt.size - str.size) {
+						reNew(_res,_res + txt.size - str.size,size + (txt.size - str.size));
+					} else
+						for (sizeType i = (e + txt.size - str.size) - 1;i >= _res + (txt.size - str.size) + 1;--i)
+							_data[i] = _data[i - (txt.size - str.size)];
 					for (sizeType i = _res;i < _res + txt.size;++i)
 						_data[i] = txt[i - _res];
 					_size += (txt.size - str.size);
@@ -687,8 +669,11 @@ class BasicString {
 						_data[i] = rarr[i - _res];
 					b = _res + SIZE - 1;
 				} else if (SIZE - 1 > SIZE2 - 1) {
-					for (sizeType i = (e + (SIZE - 1) - (SIZE2 - 1)) - 1;i >= _res + ((SIZE - 1) - (SIZE2 - 1)) + 1;--i)
-						_data[i] = _data[i - ((SIZE - 1) - (SIZE2 - 1))];
+					if (capacity < size + (SIZE - 1) - (SIZE2 - 1)) {
+						reNew(_res,_res + (SIZE - 1) - (SIZE2 - 1),size + ((SIZE - 1) - (SIZE2 - 1)));
+					} else
+						for (sizeType i = (e + (SIZE - 1) - (SIZE2 - 1)) - 1;i >= _res + ((SIZE - 1) - (SIZE2 - 1)) + 1;--i)
+							_data[i] = _data[i - ((SIZE - 1) - (SIZE2 - 1))];
 					for (sizeType i = _res;i < _res + SIZE - 1;++i)
 						_data[i] = rarr[i - _res];
 					_size += ((SIZE - 1) - (SIZE2 - 1));
@@ -883,7 +868,7 @@ class BasicString {
 	}
 	BasicString& operator=(const BasicString &as) noexcept {
 		if (_capacity < as.size)
-			reNew(0,as.size);
+			reNew(0,0,as.size);
 		for (sizeType i = 0;i < as.size;++i)
 			_data[i] = as[i];
 		_size = as.size;
@@ -892,7 +877,7 @@ class BasicString {
 	template <sizeType SIZE>
 	BasicString& operator=(TYPE<const T[SIZE]> &rarr) noexcept {
 		if (_capacity < SIZE - 1)
-			reNew(0,SIZE - 1);
+			reNew(0,0,SIZE - 1);
 		for (sizeType i = 0;i < SIZE - 1;++i)
 			_data[i] = rarr[i];
 		_size = SIZE - 1;
@@ -912,7 +897,7 @@ class BasicString {
 	BasicString& operator=(const volatile T *p) noexcept {
 		for (sizeType i = 0;p[i];++i) {
 			if (p[i + 1] != 0 and i == capacity)
-				reNew(0,capacity);
+				reNew(0,0);
 			else if (!(p[i + 1]))
 				_size = i + 1;
 			_data[i] = p[i];
@@ -1125,18 +1110,23 @@ class BasicString {
 				data[j] = _str[j - i];
 		return data;
 	}
-	void reNew(sizeType index, sizeType d) noexcept {
+	void reNew(sizeType in, sizeType in2, sizeType d) noexcept {
 		sizeType newCap = (d == 0 ? 15 : (d * 2 - d / 2));
 		T *tmp = new T[newCap];
 		
-		memcpy(tmp + index,_data,size);
+		if (in == in2)
+			memcpy(tmp,_data,size);
+		else {
+			memcpy(tmp,_data,in);
+			memcpy(tmp + in2,_data + in,size - in);
+		}
 		
 		delete [] _data;
 		_data = tmp;
 		_capacity = newCap;
 	}
-	void reNew(sizeType index = 0) noexcept {
-		reNew(index,_capacity);
+	void reNew(sizeType in = 0, sizeType in2 = 0) noexcept {
+		reNew(in,in2,_capacity);
 	}
 };
 using String      = BasicString<char>;
