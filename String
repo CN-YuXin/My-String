@@ -1,5 +1,5 @@
-#ifndef _STRING_OF_YX_
-#define _STRING_OF_YX_
+#ifndef STRING_OF_YX
+#define STRING_OF_YX
 
 #include <ostream>
 #include <istream>
@@ -8,9 +8,15 @@
 #include <initializer_list>
 #include <ReverseIterator>
 #include <Byte>
+#include <CppVersion>
 
 template <typename T>
 using TYPE = T;
+
+#if _CPP_VERSION_ == 98
+	//#error 老闭灯你CPP版本太老了跟老古董一样所以用不了我的String
+	#error C++ version too low
+#endif
 
 #ifdef STD_NAMESPACE
 namespace STD_NAMESPACE {
@@ -18,15 +24,15 @@ namespace STD_NAMESPACE {
 
 template <typename T,typename SIZE_TYPE = unsigned long long>
 class BasicString {
-	static_assert(std::is_same_v<T,char>
-		or std::is_same_v<T,wchar_t>
-		or std::is_same_v<T,char32_t>
-		or std::is_same_v<T,char16_t>,
+	static_assert(std::is_same<T,char>::value
+		or std::is_same<T,wchar_t>::value
+		or std::is_same<T,char32_t>::value
+		or std::is_same<T,char16_t>::value,
 		"Illegal type");
-	static_assert(std::is_same_v<SIZE_TYPE,unsigned short>
-		or std::is_same_v<SIZE_TYPE,unsigned int>
-		or std::is_same_v<SIZE_TYPE,unsigned long>
-		or std::is_same_v<SIZE_TYPE,unsigned long long>,
+	static_assert(std::is_same<SIZE_TYPE,unsigned short>::value
+		or std::is_same<SIZE_TYPE,unsigned int>::value
+		or std::is_same<SIZE_TYPE,unsigned long>::value
+		or std::is_same<SIZE_TYPE,unsigned long long>::value,
 		"Illegal type");
  public:
 	using sizeType             = SIZE_TYPE;
@@ -208,27 +214,45 @@ class BasicString {
 	constexpr bool operator>=(const BasicString &txt) const noexcept {
 		return size >= txt.size;
 	}
-	constexpr T& operator*() const noexcept {
+	T& operator*() const noexcept {
 		return _data[0];
 	}
-	constexpr BasicString& appEnd(T c) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& appEnd(T c) noexcept {
 		return insert(c,size);
 	}
-	constexpr BasicString& appEnd(const BasicString &txt) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& appEnd(const BasicString &txt) noexcept {
 		return insert(txt,size);
 	}
 	template <sizeType SIZE>
-	constexpr BasicString& appEnd(TYPE<const T[SIZE]> &rarr) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& appEnd(TYPE<const T[SIZE]> &rarr) noexcept {
 		return insert(rarr,size);
 	}
-	constexpr BasicString& appBegin(T c) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& appBegin(T c) noexcept {
 		return insert(c,0);
 	}
-	constexpr BasicString& appBegin(const BasicString &txt) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& appBegin(const BasicString &txt) noexcept {
 		return insert(txt,0);
 	}
 	template <sizeType SIZE>
-	constexpr BasicString& appBegin(TYPE<const T[SIZE]> &rarr) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& appBegin(TYPE<const T[SIZE]> &rarr) noexcept {
 		return insert(rarr,0);
 	}
 	constexpr BasicString copy() const noexcept {
@@ -284,8 +308,11 @@ class BasicString {
 				return false;
 		return true;
 	}
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
 	void clear() noexcept {
-		_size = 0;
+		return void(_size = 0);
 	}
 	BasicString& reverse(sizeType begin, sizeType end) noexcept {
 		if (end <= begin or begin >= size)
@@ -522,11 +549,17 @@ class BasicString {
 		}
 		return _count;
 	}
-	constexpr sizeType erase(const BasicString &txt) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	sizeType erase(const BasicString &txt) noexcept {
 		return erase(0,size,txt);
 	}
 	template <sizeType SIZE>
-	constexpr sizeType erase(TYPE<const T[SIZE]> &rarr) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	sizeType erase(TYPE<const T[SIZE]> &rarr) noexcept {
 		return erase(0,size,rarr);
 	}
 	sizeType fill(sizeType _b, sizeType _e , T _c) noexcept {
@@ -546,7 +579,10 @@ class BasicString {
 				_data[i] = _rep;
 		return *this;
 	}
-	constexpr BasicString& replace(T r, T c) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& replace(T r, T c) noexcept {
 		return replace(r,0,size,c);
 	}
 	BasicString& replace(const BasicString &txt, sizeType b, sizeType e, T c) noexcept {
@@ -598,11 +634,17 @@ class BasicString {
 		}
 		return *this;
 	}
-	constexpr BasicString& replace(const BasicString &txt, T _c) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& replace(const BasicString &txt, T _c) noexcept {
 		return replace(txt,0,size,_c);
 	}
 	template <sizeType SIZE>
-	constexpr BasicString& replace(TYPE<const T[SIZE]> &rarr, T _c) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& replace(TYPE<const T[SIZE]> &rarr, T _c) noexcept {
 		return replace(rarr,0,size,_c);
 	}
 	BasicString& replace(const BasicString &txt, sizeType b, sizeType e, const BasicString &str) noexcept {
@@ -691,11 +733,17 @@ class BasicString {
 		}
 		return *this;
 	}
-	constexpr BasicString& replace(const BasicString &txt, const BasicString &str) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& replace(const BasicString &txt, const BasicString &str) noexcept {
 		return replace(txt,0,size,str);
 	}
 	template <sizeType SIZE, sizeType SIZE2>
-	constexpr BasicString& replace(TYPE<const T[SIZE]> &rarr, TYPE<T[SIZE2]> &str) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& replace(TYPE<const T[SIZE]> &rarr, TYPE<T[SIZE2]> &str) noexcept {
 		return replace(rarr,0,size,str);
 	}
 	BasicString& toUpperCase(sizeType _b, sizeType _e) noexcept {
@@ -704,7 +752,10 @@ class BasicString {
 				_data[i] -= 32;
 		return *this;
 	}
-	constexpr BasicString& toUpperCase() noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& toUpperCase() noexcept {
 		return toUpperCase(0,size);
 	}
 	BasicString& toLowerCase(sizeType _b, sizeType _e) noexcept {
@@ -713,7 +764,10 @@ class BasicString {
 				_data[i] += 32;
 		return *this;
 	}
-	constexpr BasicString& toLowerCase() noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	BasicString& toLowerCase() noexcept {
 		return toLowerCase(0,size);
 	}
 	bool isInteger(sizeType _b, sizeType _e) const noexcept {
@@ -786,8 +840,8 @@ class BasicString {
 	}
 	template <typename IT = int>
 	IT toInteger(sizeType b, sizeType e) const noexcept {
-		static_assert(std::is_integral_v<IT>
-			and !std::is_same_v<IT,bool>,"Illegal type");
+		static_assert(std::is_integral<IT>::value
+			and !std::is_same<IT,bool>::value,"Illegal type");
 		if (!isInteger(b,e))
 			return 0;
 		bool _smal = false;
@@ -809,6 +863,7 @@ class BasicString {
 	constexpr IT toInteger() const noexcept {
 		return toInteger(0,size);
 	}
+	#if _CPP_VERSION_ >= 17
 	template <typename VALUE>
 	bool equals(VALUE&& v) const noexcept {
 		if constexpr (!std::is_same_v<std::remove_const_t<std::remove_reference_t<decltype(v)>>,BasicString>) {
@@ -822,6 +877,18 @@ class BasicString {
 		}
 		return true;
 	}
+	#else
+	bool equals(const BasicString& v) const noexcept {
+		if (size != v.size)
+			return false;
+		else {
+			for (sizeType i = 0;i < size;++i)
+				if (_data[i] != v[i])
+					return false;
+		}
+		return true;
+	}
+	#endif
 	template <sizeType SIZE>
 	bool equals(TYPE<const T[SIZE]> &rarr) const noexcept {
 		if (size != SIZE - 1)
@@ -852,7 +919,7 @@ class BasicString {
 			rarr[i] = _data[i - b];
 	}
 	template <sizeType MAX = 1024>
-	auto& getLine(std::basic_istream<T> &cin, sizeType _s, char _end = '\n') noexcept {
+	std::basic_istream<T>& getLine(std::basic_istream<T> &cin, sizeType _s, char _end = '\n') noexcept {
 		T _txt[MAX] {};
 		cin.getline(_txt,_s,_end);
 		for (sizeType i = 0;_txt[i] != '\0';++i)
@@ -860,10 +927,16 @@ class BasicString {
 				(*this) = (BasicString(_txt,0,i + 1));
 		return *this;
 	}
-	constexpr auto& getLine(std::basic_istream<T> &cin) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	std::basic_istream<T>& getLine(std::basic_istream<T> &cin) noexcept {
 		return getLine(cin,capacity);
 	}
-	constexpr auto& getLine(std::basic_istream<T> &cin,char _e) noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	std::basic_istream<T>& getLine(std::basic_istream<T> &cin,char _e) noexcept {
 		return getLine(cin,capacity,_e);
 	}
 	BasicString& operator=(const BasicString &as) noexcept {
@@ -982,8 +1055,8 @@ class BasicString {
 	}
 	template <typename IT = int>
 	static BasicString toString(IT _value) noexcept {
-		static_assert(std::is_integral_v<IT>
-			and !std::is_same_v<IT,bool>,"Illegal type");
+		static_assert(std::is_integral<IT>::value
+			and !std::is_same<IT,bool>::value,"Illegal type");
 		BasicString _result;
 		bool _sma = false;
 		if (_value < 0) {
@@ -1125,6 +1198,9 @@ class BasicString {
 		_data = tmp;
 		_capacity = newCap;
 	}
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
 	void reNew(sizeType in = 0, sizeType in2 = 0) noexcept {
 		reNew(in,in2,_capacity);
 	}
@@ -1135,8 +1211,10 @@ using U32String   = BasicString<char32_t>;
 using U16String   = BasicString<char16_t>;
 using WCharString = WString;
 
+#if _CPP_VERSION_ >= 17
 template <typename T,typename BasicString<T>::sizeType SIZE>
 BasicString(TYPE<const T[SIZE]>&) -> BasicString<T>;
+#endif
 
 #ifdef STD_NAMESPACE
 }

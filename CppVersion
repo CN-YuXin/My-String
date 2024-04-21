@@ -1,0 +1,20 @@
+#ifndef _CPP_VERSION_OF_YX_
+#define _CPP_VERSION_OF_YX_
+
+#ifdef __cplusplus
+	#if __cplusplus == 199711L
+		#define _CPP_VERSION_ 98
+	#elif __cplusplus == 201103L
+		#define _CPP_VERSION_ 11
+	#elif __cplusplus == 201402L
+		#define _CPP_VERSION_ 14
+	#elif __cplusplus == 201703L
+		#define _CPP_VERSION_ 17
+	#elif __cplusplus == 202002L
+		#define _CPP_VERSION_ 20
+	#endif
+#else
+	#define _CPP_VERSION_ 0
+#endif
+
+#endif

@@ -1,6 +1,10 @@
 #ifndef _REVERSE_ITERATOR_OF_YX_
 #define _REVERSE_ITERATOR_OF_YX_
 
+#if _CPP_VERSION_ == 98
+	#error C++ version too low
+#endif
+
 #ifdef STD_NAMESPACE
 namespace STD_NAMESPACE {
 #endif
@@ -18,38 +22,133 @@ class ReverseIterator {
 	constexpr operator decltype(it)&() const noexcept {
 		return it;
 	}
-	constexpr operator decltype(it)&() volatile noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	operator decltype(it)&() volatile noexcept {
 		return it;
 	}
-	constexpr operator decltype(it)&() noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	operator decltype(it)&() noexcept {
 		return it;
 	}
-	constexpr auto operator++(int) volatile noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator++(int) volatile noexcept {
 		return it--;
 	}
-	constexpr auto& operator++() volatile noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator++() volatile noexcept {
 		return --it;
 	}
-	constexpr auto operator--(int) volatile noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator--(int) volatile noexcept {
 		return it++;
 	}
-	constexpr auto& operator--() volatile noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator--() volatile noexcept {
+		return --it;
+	}
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator++(int) noexcept {
+		return it--;
+	}
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator++() noexcept {
+		return --it;
+	}
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator--(int) noexcept {
+		return it++;
+	}
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator--() noexcept {
 		return --it;
 	}
 	template <typename U>
-	constexpr auto operator+(U&& v) const volatile noexcept {
+	constexpr decltype(it) operator+(U&& v) const volatile noexcept {
 		return it - v;
 	}
 	template <typename U>
-	constexpr auto operator-(U&& v) const volatile noexcept {
+	constexpr decltype(it) operator-(U&& v) const volatile noexcept {
 		return it + v;
 	}
 	template <typename U>
-	constexpr auto& operator+=(U&& v) volatile noexcept {
+	constexpr decltype(it) operator+(U&& v) const noexcept {
+		return it - v;
+	}
+	template <typename U>
+	constexpr decltype(it) operator-(U&& v) const noexcept {
+		return it + v;
+	}
+	template <typename U>
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator+(U&& v) volatile noexcept {
+		return it - v;
+	}
+	template <typename U>
+	decltype(it) operator-(U&& v) volatile noexcept {
+		return it + v;
+	}
+	template <typename U>
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator+(U&& v) noexcept {
+		return it - v;
+	}
+	template <typename U>
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it) operator-(U&& v) noexcept {
+		return it + v;
+	}
+	template <typename U>
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator+=(U&& v) volatile noexcept {
 		return it -= v;
 	}
 	template <typename U>
-	constexpr auto& operator-=(U&& v) volatile noexcept {
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator+=(U&& v) noexcept {
+		return it -= v;
+	}
+	template <typename U>
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator-=(U&& v) volatile noexcept {
+		return it += v;
+	}
+	template <typename U>
+	#if _CPP_VERSION_ >= 14
+	constexpr
+	#endif
+	decltype(it)& operator-=(U&& v) noexcept {
 		return it += v;
 	}
 };
