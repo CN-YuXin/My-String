@@ -1,5 +1,5 @@
-#ifndef BYTE_OF_YX
-#define BYTE_OF_YX
+#ifndef _BYTE_OF_YX_
+#define _BYTE_OF_YX_
 
 #include <ostream>
 

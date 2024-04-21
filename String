@@ -1,5 +1,5 @@
-#ifndef STRING_OF_CD
-#define STRING_OF_CD
+#ifndef _STRING_OF_YX_
+#define _STRING_OF_YX_
 
 #include <ostream>
 #include <istream>
