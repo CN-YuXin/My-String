@@ -1,11 +1,13 @@
-#ifndef _BYTE_OF_YX_
-#define _BYTE_OF_YX_
-
-#include <ostream>
+#include <CppVersion>
 
 #if _CPP_VERSION_ == 98
 	#error C++ version too low
 #endif
+
+#if !defined(_BYTE_OF_YX_) && _CPP_VERSION_ != 98
+#define _BYTE_OF_YX_
+
+#include <ostream>
 
 #ifdef STD_NAMESPACE
 namespace STD_NAMESPACE {
