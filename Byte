@@ -26,7 +26,9 @@ class Byte {
 	constexpr Byte(const volatile Byte&& v): value(v.value) {
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator decltype(value)&() & noexcept {
 		return value;
@@ -35,7 +37,9 @@ class Byte {
 		return value;
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator volatile decltype(value)&() volatile & noexcept {
 		return value;
@@ -44,7 +48,9 @@ class Byte {
 		return value;
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator decltype(value)&&() && noexcept {
 		return (decltype(value)&&)value;
@@ -53,7 +59,9 @@ class Byte {
 		return (decltype(value)&&)value;
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator volatile decltype(value)&&() volatile && noexcept {
 		return (decltype(value)&&)value;
@@ -103,7 +111,9 @@ class Byte<false> {
 	constexpr Byte(const volatile Byte&& v): value(v.value) {
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator decltype(value)&() & noexcept {
 		return value;
@@ -112,7 +122,9 @@ class Byte<false> {
 		return value;
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator volatile decltype(value)&() volatile & noexcept {
 		return value;
@@ -121,7 +133,9 @@ class Byte<false> {
 		return value;
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator decltype(value)&&() && noexcept {
 		return (decltype(value)&&)value;
@@ -130,7 +144,9 @@ class Byte<false> {
 		return (decltype(value)&&)value;
 	}
 	#if _CPP_VERSION_ >= 14
-	constexpr
+	    constexpr
+	#else
+	    inline
 	#endif
 	operator volatile decltype(value)&&() volatile && noexcept {
 		return (decltype(value)&&)value;
