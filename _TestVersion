@@ -1,0 +1,5 @@
+#include <CppVersion>
+
+#if _CPP_VERSION_ == 98
+	#error C++ version too low
+#endif

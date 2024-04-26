@@ -1,9 +1,4 @@
-#include <CppVersion>
-
-#if _CPP_VERSION_ == 98
-	//#error 老闭灯你CPP版本太老了跟老古董一样所以用不了我的String
-	#error C++ version too low
-#endif
+#include <_TestVersion>
 
 #if !defined(_STRING_OF_YX_) && _CPP_VERSION_ != 98
 #define _STRING_OF_YX_
@@ -1246,8 +1241,8 @@ class BasicString {
 };
 using String      = BasicString<char>;
 using WString     = BasicString<wchar_t>;
-using U32String   = BasicString<char32_t>;
-using U16String   = BasicString<char16_t>;
+using Char32String   = BasicString<char32_t>;
+using Char16String   = BasicString<char16_t>;
 using WCharString = WString;
 
 #if _CPP_VERSION_ >= 17

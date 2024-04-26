@@ -1,8 +1,4 @@
-#include <CppVersion>
-
-#if _CPP_VERSION_ == 98
-	#error C++ version too low
-#endif
+#include <_TestVersion>
 
 #if !defined(_REVERSE_ITERATOR_OF_YX_) && _CPP_VERSION_ != 98
 #define _REVERSE_ITERATOR_OF_YX_
