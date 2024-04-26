@@ -19,7 +19,7 @@ namespace STD_NAMESPACE {
 #endif
 
 template <typename T,typename SIZE_TYPE = unsigned long long>
-class BasicString {
+class BasicString final {
 	static_assert(std::is_same<T,char>::value
 		or std::is_same<T,wchar_t>::value
 		or std::is_same<T,char32_t>::value
@@ -918,7 +918,7 @@ class BasicString {
 	}
 	#endif
 	template <sizeType SIZE>
-	bool equals(TYPE<const T[SIZE]> &rarr) const noexcept {
+	bool equals(TYPE<const volatile T[SIZE]> &rarr) const noexcept {
 		if (size != SIZE - 1)
 			return false;
 		for (sizeType i = 0;i < size;++i)
@@ -947,7 +947,7 @@ class BasicString {
 			rarr[i] = _data[i - b];
 	}
 	template <sizeType MAX = 1024>
-	std::basic_istream<T>& getLine(std::basic_istream<T> &cin, sizeType _s, char _end = '\n') noexcept {
+	BasicString& getLine(std::basic_istream<T> &cin, sizeType _s, char _end = '\n') noexcept {
 		T _txt[MAX] {};
 		cin.getline(_txt,_s,_end);
 		for (sizeType i = 0;_txt[i] != '\0';++i)
@@ -960,7 +960,7 @@ class BasicString {
 	#else
 	    inline
 	#endif
-	std::basic_istream<T>& getLine(std::basic_istream<T> &cin) noexcept {
+	BasicString& getLine(std::basic_istream<T> &cin) noexcept {
 		return getLine(cin,capacity);
 	}
 	#if _CPP_VERSION_ >= 14
@@ -968,7 +968,7 @@ class BasicString {
 	#else
 	    inline
 	#endif
-	std::basic_istream<T>& getLine(std::basic_istream<T> &cin,char _e) noexcept {
+	BasicString& getLine(std::basic_istream<T> &cin,char _e) noexcept {
 		return getLine(cin,capacity,_e);
 	}
 	BasicString& operator=(const BasicString &as) noexcept {
@@ -1014,6 +1014,10 @@ class BasicString {
 			if (i != 0)
 				cout << i;
 		return cout;
+	}
+	template <sizeType SIZE>
+	constexpr friend bool operator==(TYPE<const volatile T[SIZE]> &r, const BasicString &txt) noexcept {
+		return txt.equals(r);
 	}
 	template <sizeType MAX = 1024>
 	friend auto operator>>(std::basic_istream<T>& cin, BasicString<T>& text) noexcept -> decltype(cin)& {
