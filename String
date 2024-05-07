@@ -147,7 +147,7 @@ class BasicString final {
 		_size(_tx.size * _co),
 		_capacity(_tx.size * _co) {
 	}
-	constexpr const T* getData() const noexcept {
+	constexpr T* getData() const noexcept {
 		return _data;
 	}
 	constexpr sizeType getLength() const noexcept {
@@ -1089,10 +1089,8 @@ class BasicString final {
 		v.appEnd(_c);
 		return v;
 	}
-	template <typename IT = int>
+	template <typename IT = int, typename std::enable_if<std::is_integral<IT>::value and !std::is_same<IT,bool>::value,int>::type = 0>
 	static BasicString toString(IT _value) noexcept {
-		static_assert(std::is_integral<IT>::value
-			and !std::is_same<IT,bool>::value,"Illegal type");
 		BasicString _result;
 		bool _sma = false;
 		if (_value < 0) {
@@ -1153,6 +1151,33 @@ class BasicString final {
 		_r.appEnd(BasicString(_len - ((_cur * _len / _max) >= _tail.size ? (_cur * _len / _max) : _tail.size),(T)_space)).appEnd(_end);
 		if (_per)
 			    _r.appEnd((T)' ').appEnd(toString(_cur * 100 / _max)).appEnd((T)'%');
+		return _r;
+	}
+	template <typename U>
+	static BasicString toHex(U v) noexcept {
+		static_assert(std::is_integral<U>::value
+			and !std::is_same<U,bool>::value,"Illegal type");
+		BasicString _r;
+		while (v != 0) {
+			T _t = v % 16;
+			if (_t < 10) {
+				_r.appBegin(char(_t + 48));
+			} else {
+				_r.appBegin(char(_t - 10 + 65));
+			}
+			v /= 16;
+		}
+		return _r.appBegin("0x");
+	}
+	template <typename U>
+	static BasicString toBinary(U v) noexcept {
+		static_assert(std::is_integral<U>::value
+			and !std::is_same<U,bool>::value,"Illegal type");
+		BasicString _r;
+		while (v != 0) {
+			_r.appBegin(char((v % 2) + 48));
+			v /= 2;
+		}
 		return _r;
 	}
 	~BasicString() {
@@ -1243,11 +1268,11 @@ class BasicString final {
 		reNew(in,in2,_capacity);
 	}
 };
-using String      = BasicString<char>;
-using WString     = BasicString<wchar_t>;
-using Char32String   = BasicString<char32_t>;
-using Char16String   = BasicString<char16_t>;
-using WCharString = WString;
+using String       = BasicString<char>;
+using WString      = BasicString<wchar_t>;
+using Char32String = BasicString<char32_t>;
+using Char16String = BasicString<char16_t>;
+using WCharString  = WString;
 
 #if _CPP_VERSION_ >= 17
 template <typename T,typename BasicString<T>::sizeType SIZE>
