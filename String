@@ -1158,6 +1158,8 @@ class BasicString final {
 		static_assert(std::is_integral<U>::value
 			and !std::is_same<U,bool>::value,"Illegal type");
 		BasicString _r;
+		if (v < 0)
+			v = -v;
 		while (v != 0) {
 			T _t = v % 16;
 			if (_t < 10) {
@@ -1173,11 +1175,18 @@ class BasicString final {
 	static BasicString toBinary(U v) noexcept {
 		static_assert(std::is_integral<U>::value
 			and !std::is_same<U,bool>::value,"Illegal type");
+		bool _s = false;
+		if (v < 0) {
+			_s = true;
+			v = -v;
+		}
 		BasicString _r;
 		while (v != 0) {
 			_r.appBegin(char((v % 2) + 48));
 			v /= 2;
 		}
+		if (_s)
+			_r.appBegin('-');
 		return _r;
 	}
 	~BasicString() {
