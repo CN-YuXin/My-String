@@ -189,7 +189,7 @@ class BasicString final {
 	constexpr constReverseIterator crend() const noexcept {
 	    return begin() - 1;
 	}
-	constexpr T& operator[] (sizeType index) const noexcept {
+	constexpr T& operator[](sizeType index) const noexcept {
 		return _data[index];
 	}
 	constexpr bool operator==(const BasicString &e) const noexcept {
@@ -937,8 +937,10 @@ class BasicString final {
 	BasicString& setWidthString(T _c, sizeType _count) noexcept {
 		if (_count <= size)
 			return *this;
-		for (sizeType i = 1;i <= _count - size;++i)
+		sizeType _t = size;
+		for (sizeType i = 1;i <= _count - _t;++i) {
 			appBegin(_c);
+		}
 		return *this;
 	}
 	template <sizeType SIZE>
@@ -999,7 +1001,7 @@ class BasicString final {
 		move._capacity = 0;
 		return *this;
 	}
-	BasicString& operator=(const volatile T *p) noexcept {
+	BasicString& operator=(const volatile T * const volatile p) noexcept {
 		for (sizeType i = 0;p[i];++i) {
 			if (p[i + 1] != 0 and i == capacity)
 				reNew(0,0);
@@ -1089,7 +1091,7 @@ class BasicString final {
 		v.appEnd(_c);
 		return v;
 	}
-	template <typename IT = int, typename std::enable_if<std::is_integral<IT>::value and !std::is_same<IT,bool>::value,int>::type = 0>
+	template <typename IT, typename std::enable_if<std::is_integral<IT>::value and !std::is_same<IT,bool>::value,int>::type = 0>
 	static BasicString toString(IT _value) noexcept {
 		BasicString _result;
 		bool _sma = false;
@@ -1123,6 +1125,171 @@ class BasicString final {
 		_r._size = txt.size();
 		return _r;
 	}
+	static BasicString toString(long double v, int b = 6) noexcept {
+		bool _s = false;
+		if (v < 0) {
+			v = -v;
+			_s = true;
+		}
+		BasicString _r;
+		_r.appBegin(toString((unsigned long)v));
+		v -= (unsigned long)v;
+		if (b == 0) {
+			return _r;
+		}
+		sizeType _t = _r.size;
+		for (int i = 0;i <= b;++i) {
+			v *= 10;
+			_r.appEnd(T(48 + (unsigned long)v));
+			v -= (unsigned long)v;
+		}
+		if (_r[_r.size - 1] >= 53) {
+			for (sizeType i = _r.size - 2;;i--) {
+				decltype(_t) _t2 = (_r[i] + -48) + 1;
+				if (_t2 >= 10) {
+					if (i == 0) {
+						_r.appBegin((T)'1');
+						break;
+					} else {
+						_r[i] = (_t2 % 10) + 48;
+					}
+				} else {
+					_r[i] = 48 + _t2;
+					break;
+				}
+			}
+		}
+		_r.erase(_r.size - 1);
+		if (_r[_r.size - 1] == 48) {
+			for (sizeType i = _r.size - 2;;--i) {
+				if (_r[i] != 48) {
+					_r.erase(i + 1,_r.size);
+					if (i + 1 != _t)
+						_r.insert((T)'.',_t);
+					break;
+				} else if (i == _t) {
+					_r.erase(i,_r.size);
+					break;
+				}
+			}
+		} else
+			_r.insert((T)'.',_t);
+		if (_s)
+			_r.appBegin((T)'-');
+		return _r;
+	}
+	static BasicString toString(double v, int b = 6) noexcept {
+		bool _s = false;
+		if (v < 0) {
+			v = -v;
+			_s = true;
+		}
+		BasicString _r;
+		_r.appBegin(toString((unsigned long)v));
+		v -= (unsigned long)v;
+		if (b == 0) {
+			return _r;
+		}
+		sizeType _t = _r.size;
+		for (int i = 0;i <= b;++i) {
+			v *= 10;
+			_r.appEnd(T(48 + (unsigned long)v));
+			v -= (unsigned long)v;
+		}
+		if (_r[_r.size - 1] >= 53) {
+			for (sizeType i = _r.size - 2;;i--) {
+				decltype(_t) _t2 = (_r[i] + -48) + 1;
+				if (_t2 >= 10) {
+					if (i == 0) {
+						_r.appBegin((T)'1');
+						break;
+					} else {
+						_r[i] = (_t2 % 10) + 48;
+					}
+				} else {
+					_r[i] = 48 + _t2;
+					break;
+				}
+			}
+		}
+		_r.erase(_r.size - 1);
+		if (_r[_r.size - 1] == 48) {
+			for (sizeType i = _r.size - 2;;--i) {
+				if (_r[i] != 48) {
+					_r.erase(i + 1,_r.size);
+					if (i + 1 != _t)
+						_r.insert((T)'.',_t);
+					break;
+				} else if (i == _t) {
+					_r.erase(i,_r.size);
+					break;
+				}
+			}
+		} else
+			_r.insert((T)'.',_t);
+		if (_s)
+			_r.appBegin((T)'-');
+		return _r;
+	}
+	static BasicString toString(float v, int b = 6) noexcept {
+		bool _s = false;
+		if (v < 0) {
+			v = -v;
+			_s = true;
+		}
+		BasicString _r;
+		_r.appBegin(toString((unsigned long)v));
+		v -= (unsigned long)v;
+		if (b == 0) {
+			return _r;
+		}
+		sizeType _t = _r.size;
+		for (int i = 0;i <= b;++i) {
+			v *= 10;
+			_r.appEnd(T(48 + (unsigned long)v));
+			v -= (unsigned long)v;
+		}
+		if (_r[_r.size - 1] >= 53) {
+			for (sizeType i = _r.size - 2;;i--) {
+				decltype(_t) _t2 = (_r[i] + -48) + 1;
+				if (_t2 >= 10) {
+					if (i == 0) {
+						_r.appBegin((T)'1');
+						break;
+					} else {
+						_r[i] = (_t2 % 10) + 48;
+					}
+				} else {
+					_r[i] = 48 + _t2;
+					break;
+				}
+			}
+		}
+		_r.erase(_r.size - 1);
+		if (_r[_r.size - 1] == 48) {
+			for (sizeType i = _r.size - 2;;--i) {
+				if (_r[i] != 48) {
+					_r.erase(i + 1,_r.size);
+					if (i + 1 != _t)
+						_r.insert((T)'.',_t);
+					break;
+				} else if (i == _t) {
+					_r.erase(i,_r.size);
+					break;
+				}
+			}
+		} else
+			_r.insert((T)'.',_t);
+		if (_s)
+			_r.appBegin((T)'-');
+		return _r;
+	}
+	static BasicString<wchar_t> toWCharString(const BasicString<char> r) noexcept {
+		BasicString<wchar_t> re(r.size,0);
+		for (sizeType i = 0;i < r.size;++i)
+			re[i] = r[i];
+		return re;
+	}
 	static BasicString progress(sizeType _max, decltype(_max) _cur = 0, bool _per = true, decltype(_cur) _len = 35, char _bar = '=', char _space = ' ', const BasicString &_tail = BasicString(1,(T)'>'), const BasicString &_start = BasicString(1,(T)'['), const BasicString &_end = BasicString(1,(T)']')) noexcept {
 		BasicString _r = _start;
 		if (_cur > _max)
@@ -1154,25 +1321,30 @@ class BasicString final {
 		return _r;
 	}
 	template <typename U>
-	static BasicString toHex(U v) noexcept {
+	static BasicString toHex(U v, sizeType w = 8, bool _u = true) noexcept {
 		static_assert(std::is_integral<U>::value
 			and !std::is_same<U,bool>::value,"Illegal type");
 		BasicString _r;
 		if (v < 0)
 			v = -v;
-		while (v != 0) {
+		do {
 			T _t = v % 16;
 			if (_t < 10) {
 				_r.appBegin(char(_t + 48));
 			} else {
-				_r.appBegin(char(_t - 10 + 65));
+				if (_u) {
+					_r.appBegin(char(_t - 10 + 65));
+				} else {
+					_r.appBegin(char(_t - 10 + 97));
+				}
 			}
 			v /= 16;
-		}
+		} while (v != 0);
+		_r.setWidthString('0',w);
 		return _r.appBegin("0x");
 	}
 	template <typename U>
-	static BasicString toBinary(U v) noexcept {
+	static BasicString toBinary(U v, sizeType w = 8) noexcept {
 		static_assert(std::is_integral<U>::value
 			and !std::is_same<U,bool>::value,"Illegal type");
 		bool _s = false;
@@ -1181,13 +1353,13 @@ class BasicString final {
 			v = -v;
 		}
 		BasicString _r;
-		while (v != 0) {
+		do {
 			_r.appBegin(char((v % 2) + 48));
 			v /= 2;
-		}
+		} while (v != 0);
 		if (_s)
 			_r.appBegin('-');
-		return _r;
+		return _r.setWidthString('0',w);
 	}
 	~BasicString() {
 		if (_data != nullptr)
