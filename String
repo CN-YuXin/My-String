@@ -1351,14 +1351,19 @@ class BasicString final {
 		if (v < 0) {
 			_s = true;
 			v = -v;
+			--v;
 		}
 		BasicString _r;
 		do {
-			_r.appBegin(char((v % 2) + 48));
+			if (_s) {
+				_r.appBegin(char(!(v % 2) + 48));
+			} else {
+				_r.appBegin(char((v % 2) + 48));
+			}
 			v /= 2;
 		} while (v != 0);
 		if (_s)
-			_r.appBegin('-');
+			return _r.setWidthString('1',w);
 		return _r.setWidthString('0',w);
 	}
 	~BasicString() {
