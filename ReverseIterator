@@ -3,8 +3,8 @@
 #if !defined(_REVERSE_ITERATOR_OF_YX_) && _CPP_VERSION_ != 98
 #define _REVERSE_ITERATOR_OF_YX_
 
-#ifdef STD_NAMESPACE
-namespace STD_NAMESPACE {
+#ifdef USER_NAMESPACE
+namespace USER_NAMESPACE {
 #endif
 
 template <typename T>
@@ -185,7 +185,7 @@ class ReverseIterator {
 	}
 };
 
-#ifdef STD_NAMESPACE
+#ifdef USER_NAMESPACE
 }
 #endif
 
