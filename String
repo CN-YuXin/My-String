@@ -263,7 +263,7 @@ class BasicString final {
 	BasicString& appBegin(TYPE<const T[SIZE]> &rarr) noexcept {
 		return insert(rarr,0);
 	}
-	constexpr BasicString copy() const noexcept {
+	constexpr BasicString clone() const noexcept {
 		return *this;
 	}
 	constexpr bool isNotEmpty() const noexcept {
@@ -338,7 +338,7 @@ class BasicString final {
 	BasicString& reverse() noexcept {
 		return reverse(0,_size);
 	}
-	bool reLowestcapacity(sizeType cap) noexcept {
+	bool reLowestCapacity(sizeType cap) noexcept {
 		if (cap < _capacity) {
 			return true;
 		} else {
@@ -973,7 +973,19 @@ class BasicString final {
 	BasicString& getLine(std::basic_istream<T> &cin,char _e) noexcept {
 		return getLine(cin,capacity,_e);
 	}
-	BasicString& operator=(const BasicString &as) noexcept {
+	BasicString& swap(BasicString& r) noexcept {
+		sizeType _t = r._size;
+		r._size = _size;
+		_size = _t;
+		_t = r._capacity;
+		r._capacity = _capacity;
+		_capacity = _t;
+		iterator _t2 = r._data;
+		r._data = _data;
+		_data = _t2;
+		return *this;
+	}
+	BasicString& operator=(const BasicString &as) & noexcept {
 		if (_capacity < as.size)
 			reNew(0,0,as.size);
 		for (sizeType i = 0;i < as.size;++i)
@@ -1008,6 +1020,33 @@ class BasicString final {
 			else if (!(p[i + 1]))
 				_size = i + 1;
 			_data[i] = p[i];
+		}
+		return *this;
+	}
+	BasicString operator*(size_t n) const noexcept {
+		if (n == 1)
+			return *this;
+		else if (n == 0)
+			return {};
+		BasicString _r;
+		_r.reLowestCapacity(size * n);
+		for (size_t i = 0;i < n;++i)
+			_r.appEnd(n);
+		return _r;
+	}
+	BasicString& operator*=(size_t n) noexcept {
+		if (n == 1) {
+		} else if (n == 0) {
+			clear();
+		} else {
+			reNew(0,0,size * n);
+			const size_t _ = n * size;
+			for (size_t i = 0;i < _;++i) {
+				for (size_t j = 0;j < size;++j) {
+					_data[i * size + j] = _data[j];
+				}
+			}
+			_size *= n;
 		}
 		return *this;
 	}
@@ -1362,8 +1401,10 @@ class BasicString final {
 			}
 			v /= 2;
 		} while (v != 0);
-		if (_s)
-			return _r.setWidthString('1',w);
+		if (_s) {
+			_r.setWidthString('1',w);
+			return _r.appBegin('1');
+		}
 		return _r.setWidthString('0',w);
 	}
 	~BasicString() {
@@ -1464,6 +1505,9 @@ using WCharString  = WString;
 template <typename T,typename BasicString<T>::sizeType SIZE>
 BasicString(TYPE<const T[SIZE]>&) -> BasicString<T>;
 #endif
+
+#define toStringMacro(X) String(#X)
+#define toWStringMacro(X) WString(L ## #X)
 
 #ifdef STD_NAMESPACE
 }

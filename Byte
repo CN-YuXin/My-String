@@ -5,8 +5,8 @@
 
 #include <ostream>
 
-#ifdef STD_NAMESPACE
-namespace STD_NAMESPACE {
+#ifdef USER_NAMESPACE
+namespace USER_NAMESPACE {
 #endif
 
 template <bool SIG = true>
@@ -180,7 +180,7 @@ class Byte<false> {
 	}
 };
 
-#ifdef STD_NAMESPACE
+#ifdef USER_NAMESPACE
 }
 #endif
 
