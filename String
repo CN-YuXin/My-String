@@ -985,7 +985,8 @@ class BasicString final {
 		_data = _t2;
 		return *this;
 	}
-	BasicString& operator=(const BasicString &as) & noexcept {
+	BasicString& operator=(const BasicString &as) noexcept {
+		//std::cout << as << std::endl;
 		if (_capacity < as.size)
 			reNew(0,0,as.size);
 		for (sizeType i = 0;i < as.size;++i)
@@ -1481,8 +1482,8 @@ class BasicString final {
 			memcpy(tmp,_data,in);
 			memcpy(tmp + in2,_data + in,size - in);
 		}
-		
-		delete [] _data;
+		if (_data != nullptr)
+			delete [] _data;
 		_data = tmp;
 		_capacity = newCap;
 	}
