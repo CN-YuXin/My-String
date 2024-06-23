@@ -90,15 +90,15 @@ class BasicString final {
 		data((decltype(data))_data),
 		_data(initForArray(arr,begin,end)),
 		_size(begin >= SIZE or end <= begin ? 0 : end - begin),
-		_capacity(end <= begin ? SIZE : _size) {
+		_capacity(begin >= SIZE or end <= begin ? SIZE : _size) {
 	}
 	BasicString(const BasicString &txt, sizeType b, sizeType e) noexcept:
 	 	length(_size),
 	 	capacity(_capacity),
 	 	data((decltype(data))_data),
 	 	_data(initForString(txt,b,e)),
-	 	_size(e <= b ? 0 : e - b),
-	 	_capacity(e <= b ? txt.length : _size) {
+	 	_size(b >= txt.length or e <= b ? 0 : e - b),
+	 	_capacity(b >= txt.length or e <= b ? txt.length : _size) {
 	}
 	BasicString(std::initializer_list<T> init) noexcept:
 		length(_size),
@@ -1479,7 +1479,7 @@ class BasicString final {
 	}
 	template <sizeType SIZE>
 	static T* initForArray(const volatile T(&arr)[SIZE], sizeType begin, sizeType end) noexcept {
-		if (end <= begin)
+		if (end <= begin or begin >= SIZE)
 			return new T[SIZE];
 		T *data = new T[end - begin];
 		for (sizeType i = begin;i < end and i < SIZE;++i)
@@ -1493,7 +1493,7 @@ class BasicString final {
 		return data;
 	}
 	static T* initForString(const BasicString &txt, sizeType b, sizeType e) noexcept {
-		if (e <= b)
+		if (e <= b or b >= txt.length)
 			return new T[txt.length];
 		T *data = new T[e - b];
 		for (sizeType i = b;i < e and i < txt.length;++i)
@@ -1555,11 +1555,6 @@ using WString      = BasicString<wchar_t>;
 using Char32String = BasicString<char32_t>;
 using Char16String = BasicString<char16_t>;
 using WCharString  = WString;
-
-#if _CPP_VERSION_ >= 17
-template <typename T,typename BasicString<T>::sizeType SIZE>
-BasicString(const T(&)[SIZE]) -> BasicString<T>;
-#endif
 
 #define toStringMacro(X) String(#X)
 #define toWStringMacro(X) WString(L ## #X)
