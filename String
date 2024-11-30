@@ -1,4 +1,4 @@
-#include <_TestVersion>
+#include "_TestVersion"
 
 #if !defined(_STRING_OF_YX_) && _CPP_VERSION_ != 98
 #define _STRING_OF_YX_
@@ -8,8 +8,10 @@
 #include <type_traits>
 #include <string>
 #include <initializer_list>
-#include <ReverseIterator>
-#include <Byte>
+#include "ReverseIterator"
+#include "Byte"
+#include <PrintStream>
+PrintStream o;
 
 #ifdef USER_NAMESPACE
 namespace USER_NAMESPACE {
@@ -105,8 +107,8 @@ class BasicString final {
 		capacity(_capacity),
 		data((decltype(data))_data),
 		_data(initForInit(init)),
-		_size(init.length()),
-		_capacity(init.length()) {
+		_size(init.size()),
+		_capacity(init.size()) {
 	}
 	BasicString(const std::basic_string<T> &stxt) noexcept:
 		length(_size),
@@ -157,10 +159,10 @@ class BasicString final {
 	constexpr iterator end() const noexcept {
 		return _data + _size;
 	}
-	constexpr const iterator cbegin() const noexcept {
+	constexpr constIterator cbegin() const noexcept {
 		return _data;
 	}
-	constexpr const iterator cend() const noexcept {
+	constexpr constIterator cend() const noexcept {
 		return _data + _size;
 	}
 	constexpr reverseIterator rbegin() const noexcept {
@@ -220,21 +222,17 @@ class BasicString final {
 	constexpr bool operator>=(const T(&rarr)[S]) const noexcept {
 		return length >= S - 1;
 	}
-	T& operator*() const noexcept {
+	constexpr T& operator*() const noexcept {
 		return _data[0];
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& appEnd(T c) noexcept {
 		return insert(c,length);
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& appEnd(const BasicString &txt) noexcept {
 		return insert(txt,length);
@@ -242,35 +240,27 @@ class BasicString final {
 	template <sizeType SIZE>
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& appEnd(const T(&rarr)[SIZE]) noexcept {
 		return insert(rarr,length);
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
-	BasicString& appBegin(T c) noexcept {
+	BasicString& appFront(T c) noexcept {
 		return insert(c,0);
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
-	BasicString& appBegin(const BasicString &txt) noexcept {
+	BasicString& appFront(const BasicString &txt) noexcept {
 		return insert(txt,0);
 	}
 	template <sizeType SIZE>
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
-	BasicString& appBegin(const T(&rarr)[SIZE]) noexcept {
+	BasicString& appFront(const T(&rarr)[SIZE]) noexcept {
 		return insert(rarr,0);
 	}
 	constexpr BasicString clone() const noexcept {
@@ -328,8 +318,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	void clear() noexcept {
 		return void(_size = 0);
@@ -395,7 +383,7 @@ class BasicString final {
 	}
 	template <typename F>
 	sizeType findIf(F &&fn, sizeType _b, sizeType _e) const noexcept {
-		for (sizeType i = _b;i < _e and i < length and i < length;++i)
+		for (sizeType i = _b;i < _e and i < length;++i)
 			if (fn(data + i))
 				return i;
 		return -1;
@@ -571,8 +559,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	sizeType erase(const BasicString &txt) noexcept {
 		return erase(0,length,txt);
@@ -580,8 +566,6 @@ class BasicString final {
 	template <sizeType SIZE>
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	sizeType erase(const T(&rarr)[SIZE]) noexcept {
 		return erase(0,length,rarr);
@@ -605,8 +589,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& replace(T r, T c) noexcept {
 		return replace(r,0,length,c);
@@ -662,8 +644,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& replace(const BasicString &txt, T _c) noexcept {
 		return replace(txt,0,length,_c);
@@ -671,8 +651,6 @@ class BasicString final {
 	template <sizeType SIZE>
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& replace(const T(&rarr)[SIZE], T _c) noexcept {
 		return replace(rarr,0,length,_c);
@@ -765,8 +743,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& replace(const BasicString &txt, const BasicString &str) noexcept {
 		return replace(txt,0,length,str);
@@ -774,8 +750,6 @@ class BasicString final {
 	template <sizeType SIZE, sizeType SIZE2>
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& replace(const T(&rarr)[SIZE], T(&str)[SIZE2]) noexcept {
 		return replace(rarr,0,length,str);
@@ -788,8 +762,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& toUpperCase() noexcept {
 		return toUpperCase(0,length);
@@ -802,11 +774,24 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& toLowerCase() noexcept {
 		return toLowerCase(0,length);
+	}
+	#if _CPP_VERSION_ >= 14
+		constexpr
+	#endif
+	BasicString& invertCase(sizeType _b, sizeType _e) noexcept {
+		for (sizeType i = _b;i < _e and i < length;++i) {
+			if (_data[i] >= 65 and _data[i] <= 90)
+				_data[i] += 32;
+			else if (_data[i] >= 97 and _data[i] <= 122)
+				_data[i] -= 32;
+		}
+		return *this;
+	}
+	BasicString& invertCase() noexcept {
+		return invertCase(0,length);
 	}
 	bool isInteger(sizeType _b, sizeType _e) const noexcept {
 		bool _n = true;
@@ -974,7 +959,7 @@ class BasicString final {
 			return *this;
 		sizeType _t = length;
 		for (sizeType i = 1;i <= _count - _t;++i) {
-			appBegin(_c);
+			appFront(_c);
 		}
 		return *this;
 	}
@@ -994,16 +979,12 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& getLine(std::basic_istream<T> &cin) noexcept {
 		return getLine(cin,capacity);
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	BasicString& getLine(std::basic_istream<T> &cin,char _e) noexcept {
 		return getLine(cin,capacity,_e);
@@ -1086,7 +1067,8 @@ class BasicString final {
 		BasicString _r;
 		_r.reLowestCapacity(length * n);
 		for (sizeType i = 0;i < n;++i)
-			_r.appEnd(n);
+			for (sizeType j = 0;j < length;++j)
+				_r.appEnd(_data[j]);
 		return _r;
 	}
 	BasicString& operator*=(sizeType n) noexcept {
@@ -1194,11 +1176,11 @@ class BasicString final {
 			_sma = true;
 		}
 		do {
-			_result.appBegin(T(48 + _value % 10));
+			_result.appFront(T(48 + _value % 10));
 			_value /= 10;
 		} while (_value != 0);
 		if (_sma)
-			_result.appBegin((T)'-');
+			_result.appFront((T)'-');
 		return _result;
 	}
 	template <typename IT, sizeType SIZE>
@@ -1219,30 +1201,30 @@ class BasicString final {
 		_r._size = txt.length();
 		return _r;
 	}
-	static BasicString toString(long double v, int b = 6) noexcept {
+	template <class IT = int, typename std::enable_if<std::is_integral<IT>::value and !std::is_same<IT,bool>::value,int>::type = 0>
+	static BasicString toString(long double v, IT b = 6) noexcept {
 		bool _s = false;
 		if (v < 0) {
 			v = -v;
 			_s = true;
 		}
 		BasicString _r;
-		_r.appBegin(toString((unsigned long)v));
+		_r.appFront(toString((unsigned long)v));
 		v -= (unsigned long)v;
-		if (b == 0) {
-			return _r;
-		}
 		sizeType _t = _r.length;
-		for (int i = 0;i <= b;++i) {
+		for (IT i = 1;i <= b;++i) {
 			v *= 10;
 			_r.appEnd(T(48 + (unsigned long)v));
 			v -= (unsigned long)v;
 		}
-		if (_r[_r.length - 1] >= 53) {
-			for (sizeType i = _r.length - 2;;i--) {
-				decltype(_t) _t2 = (_r[i] + -48) + 1;
+		if ((unsigned long)(v * 10) >= 5) {
+			for (sizeType i = _r.length - 1;;--i) {
+				decltype(_t) _t2 = _r[i] -47;
 				if (_t2 >= 10) {
 					if (i == 0) {
-						_r.appBegin((T)'1');
+						_r[i] = (T)'0';
+						_r.appFront((T)'1');
+						++_t;
 						break;
 					} else {
 						_r[i] = (_t2 % 10) + 48;
@@ -1253,49 +1235,44 @@ class BasicString final {
 				}
 			}
 		}
-		_r.erase(_r.length - 1);
 		if (_r[_r.length - 1] == 48) {
-			for (sizeType i = _r.length - 2;;--i) {
-				if (_r[i] != 48) {
+			for (sizeType i = _r.length - 1;;--i) {
+				if (_r[i] != 48 or i + 1 == _t) {
 					_r.erase(i + 1,_r.length);
-					if (i + 1 != _t)
-						_r.insert((T)'.',_t);
-					break;
-				} else if (i == _t) {
-					_r.erase(i,_r.length);
 					break;
 				}
 			}
-		} else
+		}
+		if (b != 0 and _r.length > _t)
 			_r.insert((T)'.',_t);
 		if (_s)
-			_r.appBegin((T)'-');
+			_r.appFront((T)'-');
 		return _r;
 	}
-	static BasicString toString(double v, int b = 6) noexcept {
+	template <class IT = int, typename std::enable_if<std::is_integral<IT>::value and !std::is_same<IT,bool>::value,int>::type = 0>
+	static BasicString toString(double v, IT b = 6) noexcept {
 		bool _s = false;
 		if (v < 0) {
 			v = -v;
 			_s = true;
 		}
 		BasicString _r;
-		_r.appBegin(toString((unsigned long)v));
+		_r.appFront(toString((unsigned long)v));
 		v -= (unsigned long)v;
-		if (b == 0) {
-			return _r;
-		}
 		sizeType _t = _r.length;
-		for (int i = 0;i <= b;++i) {
+		for (IT i = 1;i <= b;++i) {
 			v *= 10;
 			_r.appEnd(T(48 + (unsigned long)v));
 			v -= (unsigned long)v;
 		}
-		if (_r[_r.length - 1] >= 53) {
-			for (sizeType i = _r.length - 2;;i--) {
-				decltype(_t) _t2 = (_r[i] + -48) + 1;
+		if ((unsigned long)(v * 10) >= 5) {
+			for (sizeType i = _r.length - 1;;--i) {
+				decltype(_t) _t2 = _r[i] -47;
 				if (_t2 >= 10) {
 					if (i == 0) {
-						_r.appBegin((T)'1');
+						_r[i] = (T)'0';
+						_r.appFront((T)'1');
+						++_t;
 						break;
 					} else {
 						_r[i] = (_t2 % 10) + 48;
@@ -1306,49 +1283,44 @@ class BasicString final {
 				}
 			}
 		}
-		_r.erase(_r.length - 1);
 		if (_r[_r.length - 1] == 48) {
-			for (sizeType i = _r.length - 2;;--i) {
-				if (_r[i] != 48) {
+			for (sizeType i = _r.length - 1;;--i) {
+				if (_r[i] != 48 or i + 1 == _t) {
 					_r.erase(i + 1,_r.length);
-					if (i + 1 != _t)
-						_r.insert((T)'.',_t);
-					break;
-				} else if (i == _t) {
-					_r.erase(i,_r.length);
 					break;
 				}
 			}
-		} else
+		}
+		if (b != 0 and _r.length > _t)
 			_r.insert((T)'.',_t);
 		if (_s)
-			_r.appBegin((T)'-');
+			_r.appFront((T)'-');
 		return _r;
 	}
-	static BasicString toString(float v, int b = 6) noexcept {
+	template <class IT = int, typename std::enable_if<std::is_integral<IT>::value and !std::is_same<IT,bool>::value,int>::type = 0>
+	static BasicString toString(float v, IT b = 6) noexcept {
 		bool _s = false;
 		if (v < 0) {
 			v = -v;
 			_s = true;
 		}
 		BasicString _r;
-		_r.appBegin(toString((unsigned long)v));
+		_r.appFront(toString((unsigned long)v));
 		v -= (unsigned long)v;
-		if (b == 0) {
-			return _r;
-		}
 		sizeType _t = _r.length;
-		for (int i = 0;i <= b;++i) {
+		for (IT i = 1;i <= b;++i) {
 			v *= 10;
 			_r.appEnd(T(48 + (unsigned long)v));
 			v -= (unsigned long)v;
 		}
-		if (_r[_r.length - 1] >= 53) {
-			for (sizeType i = _r.length - 2;;i--) {
-				decltype(_t) _t2 = (_r[i] + -48) + 1;
+		if ((unsigned long)(v * 10) >= 5) {
+			for (sizeType i = _r.length - 1;;--i) {
+				decltype(_t) _t2 = _r[i] -47;
 				if (_t2 >= 10) {
 					if (i == 0) {
-						_r.appBegin((T)'1');
+						_r[i] = (T)'0';
+						_r.appFront((T)'1');
+						++_t;
 						break;
 					} else {
 						_r[i] = (_t2 % 10) + 48;
@@ -1359,23 +1331,18 @@ class BasicString final {
 				}
 			}
 		}
-		_r.erase(_r.length - 1);
 		if (_r[_r.length - 1] == 48) {
-			for (sizeType i = _r.length - 2;;--i) {
-				if (_r[i] != 48) {
+			for (sizeType i = _r.length - 1;;--i) {
+				if (_r[i] != 48 or i + 1  == _t) {
 					_r.erase(i + 1,_r.length);
-					if (i + 1 != _t)
-						_r.insert((T)'.',_t);
-					break;
-				} else if (i == _t) {
-					_r.erase(i,_r.length);
 					break;
 				}
 			}
-		} else
+		}
+		if (b != 0 and _r.length > _t)
 			_r.insert((T)'.',_t);
 		if (_s)
-			_r.appBegin((T)'-');
+			_r.appFront((T)'-');
 		return _r;
 	}
 	static BasicString<wchar_t> toWCharString(const BasicString<char> r) noexcept {
@@ -1384,7 +1351,17 @@ class BasicString final {
 			re[i] = r[i];
 		return re;
 	}
-	static BasicString progress(sizeType _max, decltype(_max) _cur = 0, bool _per = true, decltype(_cur) _len = 35, char _bar = '=', char _space = ' ', const BasicString &_tail = BasicString(1,(T)'>'), const BasicString &_start = BasicString(1,(T)'['), const BasicString &_end = BasicString(1,(T)']')) noexcept {
+	static BasicString progress(
+			sizeType          _max,
+			decltype(_max)    _cur    = 0,
+			bool              _per    = true,
+			decltype(_cur)    _len    = 35,
+			char              _bar    = '=',
+			char              _space  = ' ',
+			const BasicString &_tail  = BasicString(1,(T)'>'),
+			const BasicString &_start = BasicString(1,(T)'['),
+			const BasicString &_end   = BasicString(1,(T)']')
+		) noexcept {
 		BasicString _r = _start;
 		if (_cur > _max)
 			_cur = _max;
@@ -1424,18 +1401,18 @@ class BasicString final {
 		do {
 			T _t = v % 16;
 			if (_t < 10) {
-				_r.appBegin(char(_t + 48));
+				_r.appFront(char(_t + 48));
 			} else {
 				if (_u) {
-					_r.appBegin(char(_t - 10 + 65));
+					_r.appFront(char(_t - 10 + 65));
 				} else {
-					_r.appBegin(char(_t - 10 + 97));
+					_r.appFront(char(_t - 10 + 97));
 				}
 			}
 			v /= 16;
 		} while (v != 0);
 		_r.setWidthString('0',w);
-		return _r.appBegin("0x");
+		return _r.appFront("0x");
 	}
 	template <typename U>
 	static BasicString toBinary(U v, sizeType w = 8) noexcept {
@@ -1450,15 +1427,15 @@ class BasicString final {
 		BasicString _r;
 		do {
 			if (_s) {
-				_r.appBegin(char(!(v % 2) + 48));
+				_r.appFront(char(!(v % 2) + 48));
 			} else {
-				_r.appBegin(char((v % 2) + 48));
+				_r.appFront(char((v % 2) + 48));
 			}
 			v /= 2;
 		} while (v != 0);
 		if (_s) {
 			_r.setWidthString('1',w);
-			return _r.appBegin('1');
+			return _r.appFront('1');
 		}
 		return _r.setWidthString('0',w);
 	}
@@ -1501,8 +1478,8 @@ class BasicString final {
 		return data;
 	}
 	static T* initForInit(const std::initializer_list<T> &ini) noexcept {
-		T *data = new T[ini.length()];
-		for (sizeType i = 0;i < ini.length();++i)
+		T *data = new T[ini.size()];
+		for (sizeType i = 0;i < ini.size();++i)
 			data[i] = *(ini.begin() + i);
 		return data;
 	}
@@ -1543,8 +1520,6 @@ class BasicString final {
 	}
 	#if _CPP_VERSION_ >= 14
 	    constexpr
-	#else
-	    inline
 	#endif
 	void reNew(sizeType in = 0, sizeType in2 = 0) noexcept {
 		reNew(in,in2,_capacity);
