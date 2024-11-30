@@ -10,8 +10,6 @@
 #include <initializer_list>
 #include "ReverseIterator"
 #include "Byte"
-#include <PrintStream>
-PrintStream o;
 
 #ifdef USER_NAMESPACE
 namespace USER_NAMESPACE {
